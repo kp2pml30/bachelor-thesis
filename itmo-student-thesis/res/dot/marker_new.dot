@@ -1,0 +1,15 @@
+digraph G {
+	node [shape="record"];
+	base [label="{MarkerBase&lt;IS\\_MIXED&gt;|.data|{{func MarkStatic|func MarkDynamic}|requires IS\\_MIXED}}"];
+	markers [label="MarkerImpl&lt;STATIC&gt;"];
+	markerd [label="MarkerImpl&lt;DYNAMIC&gt;"];
+	markerm [label="{Marker&lt;IS\\_MIXED=true&gt;|func MarkStatic|func MarkDynamic|func Mark}"];
+	base -> markers;
+	base -> markerd;
+	markers -> markerm;
+	markerd -> markerm;
+	markerms [label="{Marker&lt;STATIC&gt;|func Mark}"];
+	markermd [label="{Marker&lt;DYNAMIC&gt;|func Mark}"];
+	markers -> markerms;
+	markerd -> markermd;
+}

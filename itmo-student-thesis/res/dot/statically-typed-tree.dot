@@ -1,0 +1,6 @@
+digraph G {
+	node [shape=rect];
+	SomeObject [label="sealed SomeObject"];
+	SomeObject -> Object;
+	SomeObject -> ScriptObject;
+}

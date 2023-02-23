@@ -1,0 +1,16 @@
+digraph G {
+	node [shape="record"];
+	Input [label="Input|<fo>X : foreign object"];
+	CastValueToAnyType [label="CastValueToAnyType|{<fo>foreign object|<a>Any}"];
+	Input:fo -> CastValueToAnyType:fo;
+	SaveState [label="<ss>SaveState|<s>$v_i$|..."];
+	CastValueToAnyType:a -> SaveState:s:n;
+	CastAnyTypeToValue [label="CastAnyTypeToValue|<ss>SaveState|{<a>Any|<fo>foreign object}"];
+	SaveState:s:s -> CastAnyTypeToValue:a;
+	SaveState:ss:s -> CastAnyTypeToValue:ss;
+	IsInstance [label="IsInstanceOrDeoptimize|<ss>SaveState|{<fo>foreign object|<x>X}"];
+	CastAnyTypeToValue:fo -> IsInstance:fo;
+	SaveState:ss:s -> IsInstance:ss;
+	Output [label="output|<o>X : foreign object"];
+	IsInstance:x -> Output:o;
+}

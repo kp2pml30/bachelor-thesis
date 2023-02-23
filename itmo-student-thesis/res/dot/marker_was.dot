@@ -1,0 +1,8 @@
+digraph G {
+	node [shape="record"];
+	base [label="{MarkerBase|.data}"];
+	markers [label="{Marker&lt;STATIC&gt;|func Mark}"];
+	markerd [label="{Marker&lt;DYNAMIC&gt;|func Mark}"];
+	base -> markers;
+	base -> markerd;
+}
