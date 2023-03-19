@@ -91,30 +91,25 @@
 
 \newcommand{\TODO}{{ \color{red} TODO }}
 
-\studygroup{M3439}
-\title{Пример оформления ВКР бакалавра}
-\author{Буздалов Максим Викторович}{Буздалов М.В.}
-\supervisor{Шалыто Анатолий Абрамович}{Шалыто А.А.}{проф., д.т.н.}{главный научный сотрудник Университета ИТМО}
-\publishyear{2019}
+\studygroup{M34361}
+\title{Поддержка вызова функций и передачи объектов между реализациями языков со статическими и динамическими типизациями на платформе Ark}
+\author{Прокопенко Кирилл Дмитриевич}{Прокопенко К.Д.}
+\supervisor{Фильченков Андрей Александрович}{Фельченков А.А.}{кандидат физико-математических наук}{кандидат физико-математических наук}
+\publishyear{2023}
 %% Дата выдачи задания. Можно не указывать, тогда надо будет заполнить от руки.
-\startdate{01}{сентября}{2018}
+\startdate{29}{декабря}{2022}
 %% Срок сдачи студентом работы. Можно не указывать, тогда надо будет заполнить от руки.
-\finishdate{31}{мая}{2019}
+\finishdate{31}{мая}{2023}
 %% Дата защиты. Можно не указывать, тогда надо будет заполнить от руки.
-\defencedate{15}{июня}{2019}
+\defencedate{15}{июня}{2023}
 
-\addconsultant{Белашенков Н.Р.}{канд. физ.-мат. наук, без звания}
-\addconsultant{Беззубик В.В.}{без степени, без звания}
+\addconsultant{Соломенников Д.И.}{без сетепени, без звания}
 
 \secretary{Павлова О.Н.}
 
 %% Задание
 %%% Техническое задание и исходные данные к работе
-\technicalspec{Требуется разработать стилевой файл для системы \LaTeX, позволяющий оформлять бакалаврские работы и магистерские диссертации
-на кафедре компьютерных технологий Университета ИТМО. Стилевой файл должен генерировать титульную страницу пояснительной записки,
-задание, аннотацию и содержательную часть пояснительной записк. Первые три документа должны максимально близко соответствовать шаблонам документов,
-принятым в настоящий момент на кафедре, в то время как содержательная часть должна максимально близко соответствовать ГОСТ~7.0.11-2011
-на диссертацию.}
+\technicalspec{Требуется добавить возможность запускать скрипты из статически типизированного языка, вызывать функции и методы над статически типизированными объектами из динамического языка и наоборот, передавать объекты в обе стороны}
 
 %%% Содержание выпускной квалификационной работы (перечень подлежащих разработке вопросов)
 \plannedcontents{Пояснительная записка должна демонстрировать использование наиболее типичных конструкций, возникающих при составлении
@@ -131,8 +126,7 @@
 \end{enumerate}}
 
 %%% Цель исследования
-\researchaim{Разработка удобного стилевого файла \LaTeX
-			 для бакалавров и магистров кафедры компьютерных технологий.}
+\researchaim{Исследование принципов межъязыкового взаимодействия и его поддержка на платформе Ark.}
 
 %%% Задачи, решаемые в ВКР
 \researchtargets{\begin{enumerate}
@@ -175,17 +169,17 @@
 %% Макрос для введения. Совместим со старым стилевиком.
 \startprefacepage
 
-Language interoperability is important for several reasons:
+Межъязыковое взаимодействие является важной технологией по нескольким причинам:
 
 \begin{enumerate}
-\item Collaboration: When different teams or individuals work on a project, they may use different programming languages. Interoperability ensures that these different languages can work together seamlessly, allowing for more efficient collaboration and development.
+\item Сотрудничество: Когда несколько команд или разработчиков работают над одним проектом, им может быть удобно использовать разные языки программирования. Возможность их взаимодействия обеспечит, что эти языки могут бесшовно работать в одной программе, что повысит эффективность разработки.
 
-\item Reusability: Interoperability allows developers to reuse code that has already been written in a different language. For instance, it can expose graphics library interface from statically typed language to dynamically, without requiring to write any code or generating bindings. It can be done in the opposite direction as well: rewriting underlying library in a faster language.
+\item Переиспользование: межъязыковое взаимодействие позволяет использовать ранее написанный код на другом языке программирования. Например, оно может сделать доступным графическую библиотеку, написанную на статически типизированном языке для вызова из динамически типизированного, без требования написания дополнительного кода или генерации некоторого ``клея''. Подобное может быть проделано и в обратную сторону: уже существующая библиотека может быть переписана на более быстром языке.
 
-\item Flexibility: While most modern languages are ``general purpose'', it doesn't mean that they don't suit some tasks better than others. For instance, ecmascript-compliant languages are popular in sphere of creating user interfaces, not only because they were only alternative in browsers for a long time, but also because of simplifications that dynamic typing provides, which makes it easier for companies to hire developers in such languages. Ability to choose language suitable for a job provides greater flexibility in designing and implementing solutions.
+\item Гибкость: В то время, как многие языки программирования позиционируются как ``языки общего назначения'', это не значит, что они не подходят для некоторых задач лучше, чем для других. Например, языки, удовлетворяющие открытому стандарту ecmascript, популярны в сфере разработки графических интерфейсов. Не только из-за того что они были единственной альтернативой в браузерах на протяжении многих лет, но и благодаря упрощениям, которые дает динамическая типизация. Все перечисленное ведет к тому, что компаниям легче нанять специалиста на таком языке, нежели искать специалиста на других. Таким образом, возможность выбирать язык подходящий для задачи позволяет сделать решения более гибкими.
 \end{enumerate}
 
-While programming languages interopability is not a solved problem, amount of projects that aim to ease languages communication points to presence of demand in this sphere, as it optimizes development costs.
+В то время как межъязыковое взаимодействие не является решенной задачей, количество проектов, ставящих своей целью его упрощение указывает на спрос в данной сфере, который мог бы снизить стоимость производства программного обеспечения.
 
 %% Начало содержательной части.
 \chapter{Обзор}
@@ -193,75 +187,71 @@ While programming languages interopability is not a solved problem, amount of pr
 \startrelatedwork
 Пример ссылок в рамках обзора: \cite{example-english, example-russian, unrestricted-jump-evco, doerr-doerr-lambda-lambda-self-adjustment-arxiv}.
 
-\section{Terminology}
-\TODO
+\section{Существующие решения}
+\subsection{Нативный-нативный}
+Взаимодействие языков в данной области сводится к поддержке совместимости с ABI\footnote{ABI~--- бинарный интерфейс приложения} языка C. Известные решения, зачастую, включают целые языки: C++ и Zig, которые, по сути, позволяют включать целые заголовочные файлы самого языка C. В случае C++ для функций необъодима пометка \texttt{extern "C"} для того чтобы отключить ``коверканье'' слов, а в языке Zig достаточно просто указать интринсик \texttt{@cInclude}, который разберет файл при помощи библиотеки clang и автоматически сгенерирует декларации на языке (однако, включение одного и того же файла два раза подряд может привести к несовместимости).
 
-\section{Existing solutions}
-\subsection{Native-native}
-Interop in this area boils down to exposing common interfaces compatible with C language ABI. Notable solutions are entire languages: C++ and zig, which, basically, support including C header files (in case of C++ special mark \texttt{extern "C"} is required, while in zig it is possible to just \texttt{@cInclude} file, which will parse it with clang and automatically convert bindings to corresponding internal zig forward declarations)
-
-\subsection{Managed-native}
-\subsubsection{JNI}
-To work around a moving garbage collector, all pointers to objects are stored in a dedicated array, where they are updated by GC, and native code can work with them only via indirect handles, which point to that array. Raw pointer can't be acquired, because native code doesn't insert ``safe points'' with any regularity, and to provide stability of JVM while thread is executing native code, it is considered to be in a safe point for whole time (which, for instance, allows garbage collector to run). As this implies checking GC status on each java-heap access, additional ``critical'' functions are brought into API, such as \texttt{GetPrimitiveArrayCritical}, which acquires raw pointer to array of primitives data, and blocks garbage collector from running until release of this pointer. Also, there is no API to access native data from Java, which makes all interop Java-centric and forces to make getters/setters in native api, calls to which are slower than to managed code.\\
-As of other limitations, it requires generating a header file, which makes this tool slightly less convenient.
+\subsection{Управляемый-нативный}
+\subsubsection{JNI --- Java Native Interface}
+Чтобы справится с двигающим сборщиком мусора, все указатели на объекты Java кучи помещаются в специальный массив, о котором знает сборщик мусора. В результате, нативный код взаимодействует только с косвенными указателями. Из-за того, что нативный код не гарантирует расстановку ``безопасных точек''\footnote{Safe point --- место в программе, где она может остановиться для некоторого этапа сборки мусора или деоптимизации. В частности, это означает, что известно расположение объектов в регистрах и на стеке.} с какой-либо регулярностью, на время всего исполнения нативного кода поток погружаетя в безопасное состояние, а все функции, обладающие доступом к Java куче, замедляются из-за того, что должны возвращаться из этого безопасного состояния. Для ускорения программ, существуют некоторые ``критические'' функции, такие как \texttt{GetPrimitiveArrayCritical}, которые дают настоящий указатель, но могут заблокировать все Java приложение до тех пор, пока этот указатель не будет освобожден.\\
+Доступа из Java к нативной куче нет, что обязывает создавать нативные функции доступа, которые, в свою очередь, работают медленнее, чем ``аналогичные'' написанные на Java. К другим ограничениям, для нативных функций необходимо генерировать специальные заголовочные файлы.\\
 \subsubsection{Project panama}
-Project that addresses limitations of JNI. It allows to call native functions with variadic arguments (note that in java they are packed into an array, while on native platforms they are passed in unsafe manner: via registers or on stack, without any control of their count, which can cause memory bugs), allows to access native heap in a more safe and easy way than \texttt{sun.misc.Unsafe}. Declaring natively layouted structures in java may be useful as well, because JVM is allowed to reorder fields as it wishes, which makes it impossible to explicitly pad them to avoid false sharing. Hence this project may be useful even for java-only projects.
+Проект старается бороться с ограничениями JNI: добавляет доступ из Java к объектам на нативной куче (условно, по указателям, но проще и безопаснее чем \texttt{sun.misc.Unsafe}), добавляет поддержку нативных функций с переменным числом аргументов (в Java они бы запаковались в массив, в то время как в нативном соглашении о вызовах передались бы в небезопасной манере: через регистры или стек, без контроля за числом аргументов, что, конечно, менее безопасно, однако имеет свои применения).\\
+Декларация структур с нативным расположением полей может помочь и обычным Java приложениям, т.к. виртуальная машина имеет право переупорядочивать поля, а задание строгого расположения может помочь избежать, например, false sharing'а\footnote{false sharing~---ситуация, когда два потока обращаются по разным адресам памяти, которые, однако, расположены на одной кэш-линии, что приводит к ухудшению производительности}, за счет добавления неиспользуемых полей.
 \subsubsection{LuaJIT}
-Introduces entire C language declarations parser to extend type system of lua with ``\texttt{cdata}'' type in addition to tables, numbers, etc. This approach allows to access C structures fields and call foreign functions with native performance, with an assumption that they don't modify lua state.
+Добавляет полноценный синтаксический анализатор деклараций языка C, благодаря чему расширяет типовую систему lua добавлением нового типа \texttt{cdata} в добавок к таблицам, числам и т.д. Данный подход позволяет вызывать нативные функции и обращаться к полям нативных структур с той же производительностью, что и изначальный язык --- C (за исключением проверок типов).
 \subsubsection{CPPYY}
-Exposes C++ code to python. This is possible with cling: C++ interpreter and JIT compiler, based on clang and LLVM. While it may be convenient to separate large parts of application into C++ library, this tool doesn't erase cost of calling a function in python. Simple micro-benchmark at appendix~\ref{apx:cppyy-bench} demonstrates that calling trivial C++ function may be even slower, because it also requires reboxing numbers at language boundary.
+Позволяет вызывать различные конструкции языка C++ из питона при помощи использования проекта cling: интерпретатора и JIT компилятора C++, построенного на основе проекта LLVM. В то время, как он является удобной заменой автоматическим генератором ``клея'', и может быть использован для выноса крупных частей приложения на C++ для ускорения, он не устраняет стоимость вызова процедур в питоне, и может ее даже увеличивать за счет необходимости перепаковывать типы (например, \texttt{int} в питоне это большое число, но в рамках перехода между языками оно может быть преобразовано к \texttt{int} из C, что, на ряду с проверкой типов, будет требовать запаковку и распаковку). Замер скорости на маленькой программе в аппендиксе~\ref{apx:cppyy-bench} демонстрирует этот эффект.
 \subsubsection{Haskell FFI}
-Allows to call functions from shared library with primitive types and pointers, which makes it unidirectional and limited. Access to C structures is done either via reads by offset with sizes, or via marshalling (which is a user-friendly wrapper for prior).
+Позволяет вызывать функции языка C с примитивами и указателями, что делает его крайне ограниченным и однонаправленным. Однако, есть возможность доступа к полям структур через смещение и размер, что, в сочетании с аппликативом, позволяет относительно удобно делать маршаллинг.
 
-\subsection{Managed-Managed}
-\subsubsection{JVM}
-Most languages have relatively close type systems to Java, Groovy and Kotlin, and it is possible to compile them into single representation without significant performance degradation.\\
-Other languages have compromises in their design (such as \texttt{null}'s in Scala) to be compatible with ``legacy'' systems, and allow slow migration to a more stable language.
+\subsection{Управляемый-управлемый}
+\subsubsection{JVM/.NET}
+Многие языки (такие как Kotlin) имеют относительно близкую к ``главному'' языку (Java или C\#) систему типов, что позволяет компилировать их в байткод виртуальной машины без значительной потери производительности. Другие же языки должны вносить компромиссы в свой дизайн, как, например, \texttt{null} значения в языке F\#, чтобы быть полностью совместимыми со старыми языками и позволить постепенную миграцию на допускающий меньшее число ошибок яык.
 \subsubsection{Nashorn}
-Nashorn compiles ecmascript into java bytecode and raises exceptions to handle ``deoptimiations''. While it can outperform v8 on a simple benchmarks, it starts to lose when polymorphic functions come into the scene.
+Nashorn это реализация стандарта ecmascript на JVM, которая использует исключения для создания деоптимизаций. В то время, как на простых мономорфных тестах данный проект может обогнать v8, на более сложных полиморфных примерах начинают становиться видны недостатки ``позитивных типов'' и нехватка динамического профиля.
 
 \subsubsection{GraalVM}
-State of art VM which relies on a meta-circular optimization. While this approach yields fascinating results, it is not applicable to current work, as Ark platform has different runtimes and different instruction sets for each language. For instance, dynamic class representation has nothing in common with regular classes, which makes them incompatible. In different runtime parts of Ark platform even size of pointer is different, which arises problems with write barriers in garbage collection.
+Новейшая виртуальная машина, полагающаяся на мета-трассирующие оптимизации\footnote{подход, при котором создается интерпретатор дерева (потенциально, со специальными командами, о которых знает JIT компилятор), который затем компилируется}. Несмотря на удивительные результаты, данный подход имеет некоторые недостатки (о которых будет рассказано в секции \ref{sec:why-not-graal}), и не подходит для данной работы, поскольку она фокусируется на объединении двух уже существующих реализаций, которые имеют потенциально различные среды исполнения, наборы инструкций, представления объектов и даже размеры указателя, делающие их несовместимыми, и рассматривает возможные подходы именно при таких условиях.
 
 %% Так помечается конец обзора.
 \finishrelatedwork
 
-\section{What makes Ark platform different?}
-One ark runtime may have few virtual machines, that have different implementations, but share common components, for instance garbage colelction is mostly generalized. Such approach allows to implement each virtual machine in the most efficient way, keeping such techniques as NaN boxing, while disallows using language interopability on VM-bytecode level.
+\section{Что отличает платформу Ark?}
+В одном процессе может существовать несколько виртуальных машин, реализации которых различны, но имеют общие компоненты. Например, сборщик мусора почти полностью унифицирован. Такой подход позволяет реализовать каждую виртуальную машину в наиболее эффективной манере с сохранением таких подходов как NaN запаковка, но не позволяет получить такое же простое взаимодействие языков на уровне байткода, как, например, JVM.
 
-Вне обзора:~\cite{bellman}.
+\section{Наивное решение}
+Было бы возможно завернуть каждый объект статически типизированного языка в некоторый \texttt{Proxy}, который бы вызывал нативынй код среды выполнения, а она бы в свою очередь, за счет библиотеки рефлексии вызывала нужный метод или считывала поле. Однако, такое решение не только совершенно не эффективно (поскольку переключение контекста на нативный достаточно дорогая операция в сравнении с простым чтением поля объекта), но и ломало бы, например, рефлексивность равенства: чтение поля ссылочного типа каждый раз возвращало бы новый \texttt{Proxy} объект.
 
-\section{Naive solution}
-It would be possible to wrap every object from a statically typed language into a \texttt{Proxy} which would call native function to access fields and methods with a reflection library, however, such a solution is not only insufficient, because switching from managed to native context is costly and requires wrapping values into handles to prevent them from moving, but can also break equality reflexivity for proxies gain for the same object in a different way.
+\chapter{Решение}
+Их прочих решений, LuaJIT является ближайшим с динамически типизированной стороны: предлагается добавить новый тег в NaN упаковку, представляющий дерево типов ``инородных'' объектов (``foreign objects'' в коде и на некоторых схемах). Затем, эти типы интегрируются в интерпретатор и в inline кэши, которые так же используются как профиль при динамической компиляции, что позволяет внедрить новые оптимизации.\\
+Т.к. данная работа фокусируется на изменениях среды исполнения, а большая часть статически типизированных языков полагается на компиляторную ``магию'' или ``синтаксический сахар'', эта часть будет освещена довольно поверхностно, покрывая только необходимые ``примитивы'', но не их представление в коде.
 
-\chapter{SOLUTION}
-
-Out of other solutions, LuaJIT will be the closest on the dynamic type system side. To implement interopability on the dynamically typed site, new type tree is brought to represent ``foreign objects''. Then they are integrated into interpreter, which uses inline caches and collects profile info, which then is passed to a compiler. Who, on his side, brings new optimizations.\\
-As of statically typed side, because this work focuses on runtime part, while almost everything in a statically typed languages relies on a compiler magic and desugaring, this part will be covered superficially, covering essential primitives, but not their ``appearance'' in code.
-
-\section{Object representation on statically typed side}
-Type tree should be extended in a way, that previous root type should be rehanged to a new one, as shown in figure~\ref{fig:statically-typed-tree}.
+\section{Представление объектов на статически типизированной стороне}
+Дерево типов должно быть немного модифицировано, путем добавления нового корня, и переподвешиванием к нему старого, как показано в фигуре~\ref{fig:statically-typed-tree}.
+{fig:statically-typed-tree}.
 \begin{figure}[!h]
-	\caption{Modification of statically typed language hierarchy}\label{fig:statically-typed-tree}
+	\caption{Модификация иерархии статически типизированного языка}\label{fig:statically-typed-tree}
 	\centering
 	\includesvg{build/res/dot/statically-typed-tree.dot}
 \end{figure}
-Casting types is implementation specific: in Ark, both class roots class defintions extend \texttt{BaseClass}, which holds flag if object is dynamic and other most generic info. This flag must be used for performing casts from \texttt{SomeObject}. As \texttt{ScriptObject} and \texttt{SomeObject} are unrelated, it would be a great solution to require upcast before downcast, as F\# does. Upcasting to new class root can be performed without any checks, as it is a synthetic type without actual runtime representation. For accessing dynamic flag new intrinsic (which can be inlined in the compiler as few loads and bit operations) must be implemented, because managed representations of classes are not compatible, and reflections library is unsuitable.\\
-\texttt{ScriptObject} can have other fake successors for better type safety, or syntax sugar such as square brackets for property access.\\
+Проверки типов и их преобразования также должны отличаться от обычных, что связано с особенностями реализации: в обеих реализациях тип представляющий класс объекта наследует некоторый \texttt{BaseClass}, содержащий, например, информацию для сборщика мусора. Однако, это не позволяет ни использовать библиотеку рефлексии, ни преобразовывать их друг к другу, поскольку последующее представление в памяти уже различно. Необходимо добавить команду компилятора, читающую указатель на \texttt{BaseClass} и берущую флаги из нее, где указано динамический ли класс у объекта. Т.к. \texttt{Object} и \texttt{ScriptObject} никак не связаны, компилятору следует требовать преобразование через \texttt{SomeObject}, как это реализовано, например, в F\#. Преобразование к \texttt{SomeObject} может быть соблюдено без каких либо проверок, поскольку этот класс является лишь синтетической абстракцией, без какого-либо представления во время выполнения.\\
+\texttt{ScriptObject} может иметь некоторые расширения, такие как доступ к свойствам через точку или квадратные скобки, который будет компилироваться в нечто особенное, или иметь большее число наследников для выражение лучшей типовой безопасности.
 
-\section{Object representation on dynamically typed side}
-In dynamic languages, every value can be represented with a pointer to some \texttt{ObjectHeader}, however, such approach consumes insufficient amount of memory and requires allocation for each operation, as well as lengthens garbage collector pauses. As such, some implementations, such as LuaJIT use a technique called NaN boxing (which only alternative is pointer compression). According to IEEE754 standard double precision floating pointer number is represented as 1 bit for sign, 11 bits for exponent and 52 mantissa. NaN is represented with whole exponent set to 1, and most significant bit of the mantissa represents if NaN is signalling. As such, in assumption that all NaN's produced by the CPU have other bits set to zero (qNaN Indefinite on x86), it is possible to encode "tag" and "value" into that 50 spare bits. With pointer compression and custom memory allocator it is possible to ensure that even 64 bit pointers fit into that amount of memory.\\
-As such, in manner of LuaJIT new ``foreign object'' tag is brought to represent statically typed objects. For accessing static fields, functions and constructors, same can be done with storing managed classes.
+\section{Представление объекта на динамически типизированной стороне}
+В динамически типизированных языках любое значение может быть представлено как указатель на некоторый \texttt{ObjectHeader}, однако, такой подход потребляет значительное количество памяти из-за необходимости постоянных аллокаций и индирекций, что может еще и привести к удлинению пауз сборщика мусора. Из-за этого многие реализации используют одну из двух стратегий: сжатие указателей (pointer compression) или NaN упаковка (NaN boxing). Платформа Ark использует второе. Эта текхника опирается на то, согалсно стандарту IEEE-754 число с плавающей точкой двойной точности представляется как экспонента из всех единиц, и единичный бит мантиссы тоже выставляется в единицу, чтобы сделать его не сигнализирующим. В предположении, что все NaN значения, которые может сгенерировать процессор имеют нулевую мантиссу (кроме бита на сигнализирующий ли, ``qNaN Indefinite'' на x86 процессоре), остаются не занятыми 50 бит, в которые можно поместить некоторый ``тег'' и ``значение''. При помощи сжатия указателя или специального аллокатора можно добиться того, чтобы любой указатель на управлемый объект помещался в это количество бит.\\
+Таким образом, для представления инородных объектов можно ввести новый тег, по которому будет храниться ссылка на статически типизированный объект. Для представления же статических сущностей, можно сделать небольшую ``перегрузку'' этой семантики: ввести специальное поведение для случая, когда хранимая ссылка указывает на \texttt{Class} (объект, представляющий тип).
 
-\section{Inline caches}
-For purposes of optimization, most instructions have inline caches, that store information for speeding up execution, and then their data is used by an optimizing compiler as a profile info. For instance, \texttt{LdObjByName} bytecode instruction (which loads object property by it's constant name) stores a known dynamic class value and an integer representing offset. As such, when given value of this class it simply verifies that is is stored, and then loads 64 bits from the given address, instead of following all actions that a slow path does: verify that is is actually an object, or else throw a specific type error, then select object representation type: it can be either a linear array or a hash map, then find property in appropriate data structure and load it (updating inline cache).\\
-Inline caches must be extended to be able to handle foreign objects. It is enough to store a field runtime descriptor, then add another ``slow path'' which follows similar scheme: verifies that given object is foreign, then checks that it is an instance of a class base field and then loads.\\
-Notably, both functions and dynamic classes are non-movable and permanent, which implies same restrictions on profile data for foreign objects.
+\section{Inline кэши}
+Для ускорения выполнения некоторых инструкций, они имеют встраиваемые кэши, данные из которых затем используются оптимизирующим компилятором как профиль. Например, инструкция байткода \texttt{LdObjByName}, которая загружает свойство объекта по константному имени, сохраняет в себе динамический класс и число, представляющее смещение на искомое поле в нем. Таким образом, сначала кэш пустой, и во врмя исполнения необходимо узнать данные о классе: он представляется массивом или хэш-таблицей, затем при помощи подходящего алгоритма найти искомое значение ключа, обновить inline кэш и загрузить запрашиваемое значение. При повторном выполнении будет достаточно сравнить класс и сразу же загрузить значение в случае его совпадения, без совершения всех длительных действий и обращений к структурам данных, которые совершает медленный путь исполнения.\\
+Встраиваемые кэши должны быть расширены для поддержки инородных объектов за счет добавления еще одного медленного пути: проверки что объект инородный, проверки что его класс расширяет хранимый, и загрузки поля, которое хранится как указатель на представление внутри виртуальной машины, поскольку необходимо также знать тип и размер этого поля, в отличие от динамически типизированного случая, где все объекты занимают 64 бита и хранят NaN упакованное значение.\\
+Можно заметить, что и функции и типы, изначально хранимые во встраиваемых кэшах изначально были неподвижными (для сборщика мусора) и с бесконечным временем жизни, т.к. это необходимо для работы асинхронного JIT компилятора. Из-за чего и новые данные, хранимые там так же должны удовлетворять этим свойствам, что добавляет новый класс корневых объектов ко всей виртуальной машине.
 
-\section{Loading fields}
-While from the first glance it may look as trivial as guarding for foreign object tag and instance of a given class, and then loading a field and boxing it into corresponding primitive value (\texttt{int32} or \texttt{float64}) or foreign object, few brand new optimizations come into place. Main optimization is shown in figure~\ref{fig:field-opt}: unboxing after boxing can be eliminated with few nuances. Firstly, boxed value must remain in safe state (if there were any) for purpose of usage in interpreter as it occupied virtual register $v_i$, if execution fallbacks there and this ``save state'' was not eliminated by further optimizations. Secondly, as a foreign object is a reference type, which can be moved by a garbage collector, it must also appear in save state, but as it does not belong to any actual registers, new ``bridge'' must be created. And finally, \texttt{IsInstance} check can be replaced with null check, because type is known at compile time. This optimization is necessary, because just in time compiler relies on a static typing which static languages compile produced, and only not-null asserts are inserted. This null check can be eliminated using null-safety info from compiler, if it provides any.
+\section{Загрузка полей}
+В то время, как на первый взгляд может показаться, что достаточно просто вставлять проверку на инородный тег, расширение известного класса, а затем запаковывать полученное значение в соответствующее примитивное (\texttt{int32}, \texttt{float64}, \texttt{bool}) или очередной инородный объект, несколько новых оптимизаций необходимы. Основная из них продемонстрирована в фигуре~\ref{fig:field-opt}: удаление распаковки после запаковки с несколькими нюансами. Во-первых, запакованное значение должно остаться в ``безопасном состоянии''\footnote{save state---состояние, где известно какие регистры и адреса на стеке соответсвуют какому состоянию интерпретатора: регистрам, стеку и номеру инструкции интерпретатора. Из этого состояния может произойти деоптимизация или сборка мусора}, потому что занимает некоторый виртуальный регистр $v_i$, который может быть использован в случае дальнейшей деоптимизации. Однако, эта лишняя ``запаковка'' вероятно будет удалено при последующих оптимизациях, если они сочтут это безопасное состояние не используемым. Во-вторых, т.к. инородный объект это ссылочный тип, его в незавернутом состоянии тоже необходимо положить в последующее безопасное состояние, чтобы в случае сборки мусора сслыка на него обновилась. Т.к. ему не соответсвует ни один виртуальный регистр, он помещается в так называемый мост (bridge). И, наконец, последующие проверки на принадлежность к классу (\texttt{IsInstance}) могут быть статически изменены на проверки на \texttt{null}, поскольку JIT компилятор изначально полагается на компилятор статически типизированного языка, и в аналогичном коде двойного доступа к полю вставляет только проверки на нулевой указатель, но не на тип операнда. Эта проверка на нулевой указатель может быть и дальше удалена за счет информации о типах из статически типизированного языка, если он ее предоставляет, или заменена на обработку сигнала операционной системы.
+
 \begin{figure}[H]
-	\caption{Optimizing foreign objects boxing and unboxing.}\label{fig:field-opt}
+	\caption{Оптимизация запаковки и распаковки инородных объектов.}\label{fig:field-opt}
 	\centering
 		\resizebox{\textwidth}{!}{
 			\begin{tabular}{ |c|c| }
@@ -274,37 +264,43 @@ While from the first glance it may look as trivial as guarding for foreign objec
 		}
 	\end{figure}
 
-\section{Storing fields}
-For storing fields of foreign objects, compiler must know semantics of casting values. For instance, conversion from \texttt{float64} to \texttt{int8} can be done with a number of semantics: it can be either truncating, or performed as in Java: firstly convert to \texttt{int32} with special rules (e.g if floating point value exceeds maximum representable value of \texttt{int32} type, then it is set to second) and only then this \texttt{int32} is converted to a narrower type.
+\section{Сохранение полей}
+Для сохранения полей инородных объектов компилятор должен знать семантику преобразования значений. Например, конверсия из \texttt{float64} в \texttt{int8} может быть сделана несколькими способами: при помощи усечения, как в C++ (инструкция \texttt{cvttsd2si} на процессоре x86-64), или с семантикой аналогичной Java: сначала происходит преобразование к \texttt{int32} со специальными правилами (например, если значение числа с плавающей точкой больше максимального допустимого, то результат считается равным второму), и затем полученный \texttt{int32} конвертируется к числу меньшей битности.\\
+В остальном сохранение полей полностью аналогично их загрузке.
 
-\section{Threads management} \label{sec:thread-management}
-Most popular dynamically typed languages either don't allow threads creation (Lua, ecmascript) or have a global interpreter lock (CPython, Ruby MRI). There are few that allow multithreading, and they are focused either on performance (Julia) or on distribution (Elixir, Erlang). Which brings us to a conclusion, that dynamic language should interact and be ran only in a single thread of a statically typed language. Similar limitations are imposed by many libraries, such as OpenGL.\\
-Thread management is important for garbage collection, as it requires suspending all threads executing managed code during stop-the-world phases. Currently, there is a mix of threads and coroutines in implementation. As we are executing multiple thread states for different languages in a single native thread, now it requires suspending one and resuming other during this thread state switching. If coroutines (thread states) were separated from real threads, then suspension for garbage collection would boil down to suspending only actually running threads. Which means that ``thread state'' would be better if renamed to ``corotuine state''.
+\section{Управление потоками} \label{sec:thread-management}
+Большинство динамически типизированных языков либо не позволяют создавать потоки (Lua, ecmascript), либо имеют глобальный лок интерпретатора (CPython, Ruby MRI). Есть несколько языков с поддержкой многопоточности, но они либо фокусируются на производительности (Julia), либо построены вокруг распределенности (Erlang, Elixir, в которых даже сборщик мусора работает внутри одного потока). Из этого следует, что динамический язык должен взаимодействовать и выполняться только на одном реальном потоке. На самом деле, это довольно распространенное ограничение, которое имеется так же в библиотеках на подобие OpenGL.\\
+Управление потоками важно для сборки мусора, поскольку существуют фазы ``остановки мира''\footnote{англ. stop-the-world}, в которые все потоки выполняющие управляемый код должны остановиться. Это может быть реализовано за счет, например, read-write лока: исполняемые потоки берут право на чтение, а желающий их остановить на запись, и тогда его попадание в критическую секцию будет означать, что все потоки остановлены. Из-за того, что необходимо выполнять два состояния потока разных языков на одном реальном, принадлежащем операционной системе, может возникнуть путаница или неправильное количество держателей лока на чтение, и ``правильной'' архитектурой было бы иметь отдельно потоки выполнения которые бы исполняли корутины.
 
-\section{Method invocation}
+\section{Вызов методов}
 
-\section{on statically typed side}
-If multiple virtual machines for same language can coexist, which is almost obligatory because of single-thread limitations, and is used by electron for security reasons, then their handles must be known at points of language switching. This can be done in two ways: either by storing scripting language virtual machines in values gained from it's context, which requires additional boxing, or by exposing entire interface via machine handle itself. Either way, script method pointer, if saved to assign-once variable, can be optimized by JIT compiler. To avoid modifications of statically typed language compiler, this can be implemented as a special call instruction, which will appear only in handwritten bytecode, which will be called from compiled one as ``external''. With this approach JIT compiler will inline functions and produce same resulting assembly, keeping high-level language compiler unchanged.
-\subsection{on dynamically typed side}
-Overloading is a tricky case: it is possible to collect profile which will collect all argument types at invocation point, but it will slow down execution of regular ecmascript programs without significant benefit. So strategy is to find the most generic overload if possible, or else do not inline this function call and fall back into interpreter-like intrinsic call. Overloading in dynamically typed languages is somewhat unsolved problem: Python, Ruby, php and ecmascript don't have it; typescript forces programmer to write single body and check types with runtime language constructs, such as \texttt{typeof}. Prolog, Erlang and Elixir allow overloading over arguments count, which can be implemented with simple name mangling.\\
-Graal VM calls most-specific version, e.g. expression \texttt{f(1)} calls \texttt{f(int8)} over \texttt{f(int32)}. At first, this approach seems to be better, but is has significant downsides:\\
+\section{На статически типизированной стороне}
+Если несколько виртуальных машин для одного языка могу сосуществовать, что является практически обязательным, при условии что они все привязаны к своему потоку, и могут быть нужны в целях безопасности, как, например фреймворк Electron разделяет контекст в котором происходит отрисовка, от контекста с логикой, то необходимо везде передавать указатель на виртуальную машину (в терминологии v8---isolate). Этого можно достигнуть двумя способами: либо заворачивать все объекты в дополнительную прослойку, которая будет знать о привязанной вирутальной машине, либо совершать все взаимодействие через переменную, предоставляющую к ней доступ. Второй способ является более производительным, поскольку не требует дополнительных выделений памяти, но усложняет добавление синтаксического сахара для работы с динамическими объектами, возможно добавление некоторого аналога \texttt{with} из языка программирования Kotlin.\\
+В любом из описанных случаев, если указатель сохраняется в переменную с единственным присваиванием, то он потенциально может быть оптимизирован JIT компилятором. Чтобы избежать модификаций компилятора статически типизированного языка, это может быть представлено как вызов внешней функции, содержащей специальную инструкцию вызова, тогда после фазы инлайнинга получится идентичное промежуточное представление.
+
+\subsection{на динамически типизированной стороне}
+Перегрузка функций и методов это довольно сложный случай: возможно собрать профиль типов аргументов в точке вызова, однако это замедлит выполнение в случае, когда межъязыковое взаимодействие не используется, без особых преимуществ, в то время как хотелось бы следовать принципу ``not pay for what you don't use''\footnote{англ. не плати за то, что не используешь}. Таким образом, наиболее выгодная стратегия? это найти наиболее общую перегрузку, или, если ее не существует, вернуться к исходному уровню компиляции\footnote{англ. baseline~--- компиляция из байткода 1 в 1, без применения оптимизаций, зачастую сводится к вызову интринсика}.\\
+Такой, казалось бы, плохой уровень связан с тем, что перегрузка в динамических языках это не решенная проблема: Python, Ruby и ecmascript обязывают писать исключительно одну реализацию функции. Typescript позволяет сделать несколько ``перегрузок'', однако они все будут иметь общее тело, и будут разрешаться за счет динамических конструкций языка, таких как \texttt{typeof}. Пролог, Erlang и Elixir разрешают перегрузку по числу аргументов, что может быть представлено как просто функции с разными называниями; обычно арность в них записывается через \texttt{/} после имени функции.
+Graal VM вызывает самую специфическую версию, таким образом, \texttt{f(1)} вызывает \texttt(f(int8)), а не \texttt{f(int32)}. На первый взгляд может показаться, что такой подход лучше, однако он имеет значительные недостатки:\\
 \begin{enumerate}
-	\item Numeric literals are handled differently in programming languages: if type inference is supported (which likely means that language doesn't support overloading), literal probably will be represented as ``intSome'', i.e. \texttt{fromInteger 1 :: Num} in Haskell, or \texttt{comptime\_int} in Zig, which can be coerced to other types upon resolution. In Java, $1$ will be converted to \texttt{int}, if it is placed in unknown context, so \texttt{f(1)} will call \texttt{f(int32)}, which means that after copying identical line from statically typed language to dynamically, semantics changed.
-	\item Finding ``most narrow'' type means performing runtime checks on every call, which can't be avoided even with profile info, because if profile said that argument fits into \texttt{int16}, two (or four including lower and upper bounds) guards must be inserted: for both fitting \texttt{int16} and not fitting \texttt{int8}. Things are even worse when input value is a floating point.
+	\item Численные литералы по-разному обрабатываются в языках программирования: если в какой-то степени поддерживается вывод типов (в случае чего язык почти наверняка не поддерживает уже перегрузку), литерал скорее всего представляется как \texttt{intSome}, например \texttt{fromInteger 1 :: Num} в языке программирования Haskell, или \texttt{comptime\_int} в Zig'е. Этот тип затем может быть преобразован к нужному во время решения системы уравнений о типах. В Java, $1$ представляет собой литерал типа \texttt{int}, а значит \texttt{f(1)} вызовет именно \texttt{f(int32)}, а не от более узкого типа, что означает, что при простом переносе строчки из статически типизированного языка в динамически типизированный изменилась семантика.
+	\item Нахождение ``самой конкретной специализации'' означает добавление нескольких проверок во время исполнения, которых невозможно избежать за счет сбора профиля, поскольку даже если он говорит, что число поместиться в \texttt{int16}, это необходимо проверить, и в добавок к этому убедиться, что оно не помещается в \texttt{int8}. Если в языке присутствуют типы без знака, то картина усложняется еще сильнее, и становится совсем не понятно что выбирать, например, число $16$ должно вызвать функцию от целого числа без знака или со знаком? Если же на вход подается число с плавующей точкой, также необходимо проверить является ли оно целым.
+	\item Такой вызов перегрузки в некотором смысле навязывает динамически типизированному языку чужую типизацию, ведь если в его системе есть только один численный тип~--- число с плавающей точкой двойной точности, то выглядит логичным вызвать перегрузку именно от него.
 \end{enumerate}
-That said, in idiomatic code overloads are ``transparent'': programmer doesn't care if \texttt{print(int64)} or \texttt{print(int32)} was called, as they do semantically the same thing.
+При всем выше сказанном, перегрузки по большей части ``прозрачны'': программисту не важно вызовется \texttt{print(int64)} или \texttt{print(int32)}, т.к. семантически они делают одно и то же.
 
-\subsection{in general}
-As stated in section \ref{sec:thread-management}, each language has it's own ``thread state''. During interpretation it is stored in a thread-local variable, and must be reassigned on each crossing of language boundary. In compiled code it is stored in register, and switching can be encoded as a simple \texttt{mov} before and after call. However, if it changed in compiled code, and then fell back into interpreter or called runtime, it now must also be switched back. To achieve this, ``thread state'' may hold a pointer to where it belongs (address of that thread local variable), and then stored with two moves in appropriate bridges. This approach does not introduce data races, as all affected ``thread states'' belong to a single real thread.
+\subsection{в целом}
+Как сказано в секции \ref{sec:thread-management}, у каждого языка есть свое ``состояние потока''. Во время интерпретации оно хранится в переменной локальной для каждого потока операционной системы и должен быть переприсвоен при каждом пересечении языковой границы, поскольку к нему обращаются различные части среды исполнения. В скомпилированном коде указатель на это состояние лежит в регистре, и передается из функции в функцию по соглашению о вызовах. Тогда, изменение может быть закодировано как обычный \texttt{mov} известной константы до и после вызова. Однако, раньше данный регистр хранил константу, благодаря чему был полностью когерентен с локальной переменной, а теперь при переходе из скомпилированного кода в интерпретатор или среду исполнения, значения могут быть не согласованы. Этого можно избежать, если сохранить указатель на локальную переменную внутрь состояния потока в момент его создания или первого присвоения, и тогда можно будет обновлять переменную в ``мосту'' из скомпилированного кода за счет дополнительной пары \texttt{mov} инструкций. Данный подход не порождает гонок данных, благодаря тому что оба состояния потока выполняются строго на одном ``реальном''.
 
-\section{Memory management}
+\section{Управление памятью}
 
-\section{Garbage collection}
-\subsection{``Markers''}
-Garbage collection on Ark platform is mostly generalized, but some most low-level methods, that perform actual objects marking and traversing are statically parametrized with language config, which says if language is static or dynamic. For maximal reuse of existing code, existing structure can be modified in non-trivial way using (virtual) inheritance as shown in figure~\ref{fig:gc-markers}.\\
-Initially, marking code asserted that class is either static or dynamic, based on context. This code should be modified with compile time check, that if context is not mixed, then insert this assert (which will be removed in release build mode), or else switch to opposite context. This way \texttt{Marker} can be renamed to \texttt{MarkerImpl} with minimal modifications and without performance degradations for markers that exist in a single language context, if base is inherited correctly (i.e. non-virtually when it is not needed).\\
+\section{Сборка мусора}
+\subsection{``Маркеры''}
+Сборка мусора на платформе Ark по большей степени обобщена, однако самые низкоуровневые примитивы, которые, например, размечают и обходят объекты обязаны быть разными. Они параметризованы конфигурацией языка, которая, помимо прочего, указывает динамический ли язык. Для максимального переиспользования кода, данная структура может быть применено нетривиальное (и потенциально вирутальное) наследование, как показано в фигуре~\ref{fig:gc-markers}.\\
+Изначально, код размечающий объекты имел \texttt{assert}, что класс полученного объекта соответсвует контексту, и эта проверка удалялась в итоговой сборке платформы, поскольку включала атомарное чтение и условие в коде, который может выполняться десятки тысяч раз. Таким образом, чтобы не ``переплачивать'', если конфигурация (уже не языка, а платформы) указывает, что разрешено межъязыковое взаимодействие, то вставлять проверку и переключать маркер на статический режим, а иначе вызывать \texttt{assert}, который будет удален. Можно выдвинуть гипотезу, что переключение контекста происходит крайне редко, и подсказать это компилятору через встроенные команды.\\
+Таким образом, \texttt{Marker} может быть переименован в \texttt{MarkerImpl} с минимальными изменениями и без ухудшений производительности в случае, когда с данным сборщиком мусора может исполняться только один язык.
 \begin{figure}[H]
-\caption{Modification of markers hierarchy}\label{fig:gc-markers}
+\caption{Модификация иерархии маркеров}\label{fig:gc-markers}
 \centering
 	\resizebox{\textwidth}{!}{
 		\begin{tabular}{ |c|c| }
@@ -338,12 +334,12 @@ As \texttt{any} type can't be stored on statically typed side, one of following 
 Attentive reader could notice, that type system extension with new tag on dynamic side introduced yet another \texttt{null} value, which shows flaws of NaN-boxing approach compared to one used by Graal VM: plain boxing to Java's ``boxed'' types.
 
 \chapterconclusion
-As we can see, there is always a tradeoff between performance and ease of use.
+Можно заметить, что зачастую ставится вопрос о выборе между производительностью и удобством использования.
 
-\chapter{RESULTS}
+\chapter{Результаты}
 
-\section{Benefits from having different language runtimes and bytecodes}
-While projects like Graal VM optimize language developer productivity without losing peak performance, real projects have more characteristics to measure, such as memory usage, startup time and interpretation speed. Having entire abstract syntax tree in heap memory may be impermissible on mobile platforms in browser, this topic is discussed in \cite{ignition-iterpreter}
+\section{Преимущества наличия разных наборов инструкций и сред исполнения} \label{sec:why-not-graal}
+В то время, как проекты, такие как Graal VM оптимизируют скорость разработки языка программирования, и при этом не теряют пиковую скорость производительности, к сожалению, реальным крупным проектам важны и другие характеристики, такие как потребляемое пространство, время загрузки и скорость интерпретации. Наличие целого абстрактного дерева и его интерпретация может быть не позволительна, например, в браузерах на мобильных платформах. Это подробно обсуждается в презентации по добавлению интерпретатора ignition в v8 \cite{ignition-iterpreter}
 % https://v8.dev/blog/cost-of-javascript-2019
 
 \section{Benchmarks}
@@ -355,12 +351,12 @@ While projects like Graal VM optimize language developer productivity without lo
 
 %% Макрос для заключения. Совместим со старым стилевиком.
 \startconclusionpage
-In the course of work subject following results were achieved:
+В ходе выполнения работы были получены следующие результаты:
 \begin{enumerate}
-	\item area overview was conducted, which covered numerous amount of existing solutions for different languages and platforms.
-	\item solution for each of related components of the virtual machine, including memory management, interpreter and just in time compiler was proposed
-	\item code that demonstrates applicability was written
-	\item performance measurements have been taken\TODO
+	\item был проведен обзор области, покрывающий многочисленное число существующих решений для различных языков и платформ.
+	\item было предложено решение для каждой компоненты виртуальной машины, участвующей в процессе, включая управление памятью, интерпретатор и компилятор
+	\item код, демонстрирующий применимость предложенного подхода был написан и опубликован
+	\item была проведена оценка результатов при помощи замеров производительности\TODO
 \end{enumerate}
 
 
