@@ -1,0 +1,1 @@
+../eng/itmo-student-thesis.cls

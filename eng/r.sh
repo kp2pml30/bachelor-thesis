@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -e
+
+OLD_PWD=$(pwd)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+pushd "$SCRIPT_DIR" 2> /dev/null
+trap 'popd 2> /dev/null' EXIT
+
+
 PROJ="bachelor-thesis"
 
 function xelat() {
@@ -9,7 +17,7 @@ function xelat() {
 
 function build() {
     mkdir -p build/res/dot
-    for i in res/dot/*.dot
+    for i in ../res/dot/*.dot
     do
         dot "-obuild/res/dot/$(basename -- "$i").svg" -Tsvg "$i"
     done
