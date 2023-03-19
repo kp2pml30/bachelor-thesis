@@ -212,7 +212,7 @@
 \\\hline #4 \\\hline \endfirsthead
 \multicolumn{#5}{r}{\normalsize\@tablecontinuation{\thetable}} \\\hline #4 \endhead
 }{\end{longtable}}
-                    
+
 %% Библиография по ГОСТу. Используем только бибер.
 
 \RequirePackage[
@@ -373,7 +373,7 @@
   \counterwithout{lstlisting}{section}
   \counterwithout{lstlisting}{subsection}
 }
-     
+
 
 %% "Тонкая" настройка теховских штрафов при формировании абзацев.
 
@@ -529,6 +529,7 @@
 
 \RequirePackage{titlesec}
 \RequirePackage{titletoc}
+\RequirePackage[hidelinks]{hyperref}
 
 \setcounter{secnumdepth}{3}
 \titleformat{\chapter}[block]{\normalsize\bfseries\center}{\@chaptername~\thechapter.~}%
@@ -1090,7 +1091,7 @@
     \begin{center}\bfseries{\normalsize\@strings@OBJECTIVES@first}\\\@strings@OBJECTIVES@second\end{center}
     \bigskip
     \begingroup\banhyphens
-    \noindent \textbf{\@strings@Student}~\theauthor\;\par 
+    \noindent \textbf{\@strings@Student}~\theauthor\;\par
     \noindent \textbf{\@strings@Group}~\thestudygroup\; \textbf{\@strings@FacultyOf}~\thefaculty\;\par
     \noindent \textbf{\@strings@DegreeLevel:} \@strings@DegreeName\par
     \noindent \textbf{\@strings@SubjectArea:} \thespecialty\par

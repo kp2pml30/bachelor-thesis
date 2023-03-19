@@ -1,8 +1,8 @@
 \documentclass[times, % the default MS fonts which the commission likes
-			   specification,annotation, % generate aux pages in the primary language
-			   titlepage-extra-ru,specification-extra-ru,annotation-extra-ru, % generate aux pages + title in Russian
-			   languages={russian,english} % sets English as the primary language and also loads Russian
-			  ]{itmo-student-thesis}
+	specification,annotation, % generate aux pages in the primary language
+	titlepage-extra-ru,specification-extra-ru,annotation-extra-ru, % generate aux pages + title in Russian
+	languages={russian,english} % sets English as the primary language and also loads Russian
+	]{itmo-student-thesis}
 
 %% Опции пакета:
 %% - specification - если есть, генерируется задание, иначе не генерируется
@@ -27,8 +27,7 @@
 \begin{filecontents}{bachelor-thesis.bib}
 @online{ doerr-doerr-lambda-lambda-self-adjustment-arxiv,
 	year        = {2015},
-	title       = {Optimal Parameter Choices Through Self-Adjustment: Applying the 1/5-th Rule in
-				   Discrete Settings},
+	title       = {Optimal Parameter Choices Through Self-Adjustment: Applying the 1/5-th Rule in Discrete Settings},
 	author      = {Benjamin Doerr and Carola Doerr},
 	url         = {http://arxiv.org/abs/1504.03212},
 	year        = {2015},
@@ -39,16 +38,14 @@
 	year        = {2015},
 	booktitle   = {Proceedings of IEEE Congress on Evolutionary Computation},
 	author      = {Maxim Buzdalov and Anatoly Shalyto},
-	title       = {Hard Test Generation for Augmenting Path Maximum Flow
-				   Algorithms using Genetic Algorithms: Revisited},
+	title       = {Hard Test Generation for Augmenting Path Maximum Flow Algorithms using Genetic Algorithms: Revisited},
 	pages       = {2121-2128},
 	langid      = {english}
 }
 
 @article{ example-russian,
 	author      = {Максим Викторович Буздалов},
-	title       = {Генерация тестов для олимпиадных задач по программированию
-				   с использованием генетических алгоритмов},
+	title       = {Генерация тестов для олимпиадных задач по программированию с использованием генетических алгоритмов},
 	journal     = {Научно-технический вестник {СПбГУ} {ИТМО}},
 	number      = {2(72)},
 	year        = {2011},
@@ -75,11 +72,22 @@
 	year        = {1957},
 	langid      = {english}
 }
+
+@online{ ignition-iterpreter,
+	year        = {2018},
+	title       = {Firing up the Ignition interpreter},
+	author      = {v8 developers},
+	url         = {https://v8.dev/blog/ignition-interpreter},
+	langid      = {english}
+}
 \end{filecontents}
 %% Конец
 
 %% Указываем файл с библиографией.
 \addbibresource{bachelor-thesis.bib}
+
+%\def\hyper@nopatch@footnote{}
+%\usepackage[unicode=true,implicit=false]{hyperref}
 
 \begin{document}
 
@@ -249,7 +257,7 @@ Language interoperability is important for several reasons:
 \item Flexibility: While most modern languages are ``general purpose'', it doesn't mean that they don't suit some tasks better than others. For instance, ecmascript-compliant languages are popular in sphere of creating user interfaces, not only because they were only alternative in browsers for a long time, but also because of simplifications that dynamic typing provides, which makes it easier for companies to hire developers in such languages. Ability to choose language suitable for a job provides greater flexibility in designing and implementing solutions.
 \end{enumerate}
 
-While programming languages interopability is not a solved problem, amount of projects that aim to ease languages communication points to presence of demand in this sphere.
+While programming languages interopability is not a solved problem, amount of projects that aim to ease languages communication points to presence of demand in this sphere, as it optimizes development costs.
 
 %% Начало содержательной части.
 \chapter{Overview}
@@ -287,12 +295,11 @@ Nashorn compiles ecmascript into java bytecode and raises exceptions to handle `
 \subsubsection{GraalVM}
 State of art VM which relies on a meta-circular optimization. While this approach yields fascinating results, it is not applicable to current work, as Ark platform has different runtimes and different instruction sets for each language. For instance, dynamic class representation has nothing in common with regular classes, which makes them incompatible. In different runtime parts of Ark platform even size of pointer is different, which arises problems with write barriers in garbage collection.
 
-\section{Ark platform}
-\TODO
-registers and bytecodes
-
 %% Так помечается конец обзора.
 \finishrelatedwork
+
+\section{What makes Ark platform different?}
+One ark runtime may have few virtual machines, that have different implementations, but share common components, for instance garbage colelction is mostly generalized. Such approach allows to implement each virtual machine in the most efficient way, keeping such techniques as NaN boxing, while disallows using language interopability on VM-bytecode level.
 
 Вне обзора:~\cite{bellman}.
 
@@ -301,10 +308,10 @@ It would be possible to wrap every object from a statically typed language into 
 
 \chapter{SOLUTION}
 
-Out of other solutions, LuaJIT will be the closest. To implement interopability on the dynamically typed site, new type tree is brought to represent ``foreign objects''. Then they are integrated into interpreter, which uses inline caches and collects profile info, which then is passed to a compiler. Who, on his side, brings new optimizations.
+Out of other solutions, LuaJIT will be the closest on the dynamic type system side. To implement interopability on the dynamically typed site, new type tree is brought to represent ``foreign objects''. Then they are integrated into interpreter, which uses inline caches and collects profile info, which then is passed to a compiler. Who, on his side, brings new optimizations.\\
+As of statically typed side, because this work focuses on runtime part, while almost everything in a statically typed languages relies on a compiler magic and desugaring, this part will be covered superficially, covering essential primitives, but not their ``appearance'' in code.
 
 \section{Object representation on statically typed side}
-As this work focuses on runtime part, while almost everything in a statically typed languages relies on a compiler and desugaring, this part will be covered superficially.\\
 Type tree should be extended in a way, that previous root type should be rehanged to a new one, as shown in figure~\ref{fig:statically-typed-tree}.
 \begin{figure}[!h]
 	\caption{Modification of statically typed language hierarchy}\label{fig:statically-typed-tree}
@@ -324,7 +331,7 @@ Inline caches must be extended to be able to handle foreign objects. It is enoug
 Notably, both functions and dynamic classes are non-movable and permanent, which implies same restrictions on profile data for foreign objects.
 
 \section{Loading fields}
-While from the first glance it may look as trivial as guarding for foreign object tag and instance of a given class, and then loading a field and boxing it into corresponding primitive value (\texttt{int32} or \texttt{float64}) or foreign object, few brand new optimizations come into place. Main optimization is shown in figure~\ref{fig:field-opt}: unboxing after boxing can be eliminated with few nuances. Firstly, boxed value must remain in safe state (if there were any) for purpose of usage in interpreter as it occupied virtual register $v_i$, if execution fallbacks there and this ``save state'' was not eliminated by further optimizations. Secondly, as a foreign object is a reference type, which can be moved by a garbage collector, it must also appear in save state, but as it does not belong to any actual registers, new ``bridge'' must be created. And finally, \texttt{IsInstance} check can be replaced with null check, because type is known at compile time. This optimization is necessary, because compiler relies on a static typing for static languages, where only not-null asserts are inserted. This null check can be eliminated using null-safety info from statically typed language, if it provides any.
+While from the first glance it may look as trivial as guarding for foreign object tag and instance of a given class, and then loading a field and boxing it into corresponding primitive value (\texttt{int32} or \texttt{float64}) or foreign object, few brand new optimizations come into place. Main optimization is shown in figure~\ref{fig:field-opt}: unboxing after boxing can be eliminated with few nuances. Firstly, boxed value must remain in safe state (if there were any) for purpose of usage in interpreter as it occupied virtual register $v_i$, if execution fallbacks there and this ``save state'' was not eliminated by further optimizations. Secondly, as a foreign object is a reference type, which can be moved by a garbage collector, it must also appear in save state, but as it does not belong to any actual registers, new ``bridge'' must be created. And finally, \texttt{IsInstance} check can be replaced with null check, because type is known at compile time. This optimization is necessary, because just in time compiler relies on a static typing which static languages compile produced, and only not-null asserts are inserted. This null check can be eliminated using null-safety info from compiler, if it provides any.
 \begin{figure}[H]
 	\caption{Optimizing foreign objects boxing and unboxing.}\label{fig:field-opt}
 	\centering
@@ -340,32 +347,34 @@ While from the first glance it may look as trivial as guarding for foreign objec
 	\end{figure}
 
 \section{Storing fields}
-For storing fields of foreign objects, compiler must know semantics of casting values. For instance, conversion from \texttt{float64} to \texttt{int8} can be done with a number of semantics: it can be either truncating, or performed as in Java: firstly convert to \texttt{int32} with special rules (e.g if floating point value is greater than maximum representable by \texttt{int32} type, then it is set second) and then converted \texttt{int32} to narrower type.
+For storing fields of foreign objects, compiler must know semantics of casting values. For instance, conversion from \texttt{float64} to \texttt{int8} can be done with a number of semantics: it can be either truncating, or performed as in Java: firstly convert to \texttt{int32} with special rules (e.g if floating point value exceeds maximum representable value of \texttt{int32} type, then it is set to second) and only then this \texttt{int32} is converted to a narrower type.
 
-\section{Method invocation from static side}
+\section{Threads management} \label{sec:thread-management}
+Most popular dynamically typed languages either don't allow threads creation (Lua, ecmascript) or have a global interpreter lock (CPython, Ruby MRI). There are few that allow multithreading, and they are focused either on performance (Julia) or on distribution (Elixir, Erlang). Which brings us to a conclusion, that dynamic language should interact and be ran only in a single thread of a statically typed language. Similar limitations are imposed by many libraries, such as OpenGL.\\
+Thread management is important for garbage collection, as it requires suspending all threads executing managed code during stop-the-world phases. Currently, there is a mix of threads and coroutines in implementation. As we are executing multiple thread states for different languages in a single native thread, now it requires suspending one and resuming other during this thread state switching. If coroutines (thread states) were separated from real threads, then suspension for garbage collection would boil down to suspending only actually running threads. Which means that ``thread state'' would be better if renamed to ``corotuine state''.
+
+\section{Method invocation}
+
+\section{on statically typed side}
 If multiple virtual machines for same language can coexist, which is almost obligatory because of single-thread limitations, and is used by electron for security reasons, then their handles must be known at points of language switching. This can be done in two ways: either by storing scripting language virtual machines in values gained from it's context, which requires additional boxing, or by exposing entire interface via machine handle itself. Either way, script method pointer, if saved to assign-once variable, can be optimized by JIT compiler. To avoid modifications of statically typed language compiler, this can be implemented as a special call instruction, which will appear only in handwritten bytecode, which will be called from compiled one as ``external''. With this approach JIT compiler will inline functions and produce same resulting assembly, keeping high-level language compiler unchanged.
-
-\section{Method invocation from dynamic side}
+\subsection{on dynamically typed side}
 Overloading is a tricky case: it is possible to collect profile which will collect all argument types at invocation point, but it will slow down execution of regular ecmascript programs without significant benefit. So strategy is to find the most generic overload if possible, or else do not inline this function call and fall back into interpreter-like intrinsic call. Overloading in dynamically typed languages is somewhat unsolved problem: Python, Ruby, php and ecmascript don't have it; typescript forces programmer to write single body and check types with runtime language constructs, such as \texttt{typeof}. Prolog, Erlang and Elixir allow overloading over arguments count, which can be implemented with simple name mangling.\\
 Graal VM calls most-specific version, e.g. expression \texttt{f(1)} calls \texttt{f(int8)} over \texttt{f(int32)}. At first, this approach seems to be better, but is has significant downsides:\\
 \begin{enumerate}
-	\item Numeric literals are handled differently in different languages: if type inference is supported (which likely means that language doesn't support overloading), literal most likely will be represented as ``intSome'', i.e. \texttt{fromInteger 1 :: Num} in Haskell, or \texttt{comptime\_int} in Zig (which can be coerced to other types upon resolution). In Java, $1$ will be converted to int if it is placed in unknown context, so \texttt{f(1)} will call \texttt{f(int32)}, which means that after copying identical line semantics changed.
+	\item Numeric literals are handled differently in programming languages: if type inference is supported (which likely means that language doesn't support overloading), literal probably will be represented as ``intSome'', i.e. \texttt{fromInteger 1 :: Num} in Haskell, or \texttt{comptime\_int} in Zig, which can be coerced to other types upon resolution. In Java, $1$ will be converted to \texttt{int}, if it is placed in unknown context, so \texttt{f(1)} will call \texttt{f(int32)}, which means that after copying identical line from statically typed language to dynamically, semantics changed.
 	\item Finding ``most narrow'' type means performing runtime checks on every call, which can't be avoided even with profile info, because if profile said that argument fits into \texttt{int16}, two (or four including lower and upper bounds) guards must be inserted: for both fitting \texttt{int16} and not fitting \texttt{int8}. Things are even worse when input value is a floating point.
 \end{enumerate}
 That said, in idiomatic code overloads are ``transparent'': programmer doesn't care if \texttt{print(int64)} or \texttt{print(int32)} was called, as they do semantically the same thing.
 
-\section{Method invocation in general}
-\TODO thread states
-
-\section{Threads management}
-Most popular dynamically typed languages either don't allow threads creation (Lua, ecmascript) or have a global interpreter lock (CPython, Ruby MRI). There are few that allow multithreading, and they are focused either on performance (Julia) or on distribution (Elixir, Erlang). Which brings us to a conclusion, that dynamic language should interact and be ran only in a single thread of a statically typed language. Similar limitations are imposed by many libraries, such as OpenGL.\\
-Thread management is important for garbage collection, as it requires suspending all threads executing managed code during stop-the-world phases. Currently, there is a mix of threads and coroutines in implementation. As we are executing multiple thread states for different languages in a single native thread, now it requires suspending one and resuming other during this thread state switching. If coroutines (thread states) were separated from real threads, then suspension for garbage collection would boil down to suspending only actually running threads. Which means that ``thread state'' would be better if renamed to ``corotuine state''.
+\subsection{in general}
+As stated in section \ref{sec:thread-management}, each language has it's own ``thread state''. During interpretation it is stored in a thread-local variable, and must be reassigned on each crossing of language boundary. In compiled code it is stored in register, and switching can be encoded as a simple \texttt{mov} before and after call. However, if it changed in compiled code, and then fell back into interpreter or called runtime, it now must also be switched back. To achieve this, ``thread state'' may hold a pointer to where it belongs (address of that thread local variable), and then stored with two moves in appropriate bridges. This approach does not introduce data races, as all affected ``thread states'' belong to a single real thread.
 
 \section{Memory management}
 
 \section{Garbage collection}
-Garbage collection on Ark platform is mostly generalized, but some most low-level methods, that perform actual objects marking and traversing are statically parametrized with language config, which says if language is static or dynamic. For maximal reuse of existing code, existing structure can be modified in non-trivial way using virtual inheritance as shown in figure~\ref{fig:gc-markers}.\\
-Initially, marking code asserted that class is either static or dynamic, based on context. This code should be modified with compile time check, that if context is not mixed, then insert this assert (which will be removed in release build mode), or else switch to opposite context. This way \texttt{Marker} can be ranamed to \texttt{MarkerImpl} with minimal modifications and without performance degradations for markers that exist in a single language context, if base is inherited correctly (i.e. non-virtually when it is not needed).\\
+\subsection{``Markers''}
+Garbage collection on Ark platform is mostly generalized, but some most low-level methods, that perform actual objects marking and traversing are statically parametrized with language config, which says if language is static or dynamic. For maximal reuse of existing code, existing structure can be modified in non-trivial way using (virtual) inheritance as shown in figure~\ref{fig:gc-markers}.\\
+Initially, marking code asserted that class is either static or dynamic, based on context. This code should be modified with compile time check, that if context is not mixed, then insert this assert (which will be removed in release build mode), or else switch to opposite context. This way \texttt{Marker} can be renamed to \texttt{MarkerImpl} with minimal modifications and without performance degradations for markers that exist in a single language context, if base is inherited correctly (i.e. non-virtually when it is not needed).\\
 \begin{figure}[H]
 \caption{Modification of markers hierarchy}\label{fig:gc-markers}
 \centering
@@ -379,22 +388,38 @@ Initially, marking code asserted that class is either static or dynamic, based o
 		\end{tabular}
 	}
 \end{figure}
+\subsection{Iterating stacks}
+As stack-iterating depends only on type of method (dynamic/static), which is stored in every frame, modifications of stack scanning are not needed. However, as two ``thread states'' share same stack, additional check, that checks that state is topmost must be added. It can be performed using that ``address'', i.e. value located in that thread local variable equals to examined thread. As they are accessed only during stop-the world phases (such as ``initial mark pause'' and ``remark pause''), it does not introduce data race.
+\subsection{Keeping references}
+Fields and classes data, stored in profile info must be non-movable, because just in time compiler works concurrently and doesn't have access to runtime, and may be permanent, to keep equality semantics. To implement this, new virtual-machine level root objects are added, that map pointers to NaN boxed values.
 
 \section{Challenges}
 \subsection{Strings}
-As their in memory layout is different, copying is required. As they are immutable in most languages, dynamically typed string may have a pointer to alternate string from a statically typed context, which will be lazily initialized on request.
+As their in memory layout is different, copying is required. As they are immutable in most languages, dynamically typed string may have a pointer to alternate string from a statically typed context, which will be lazily initialized on request. Other transformation can't be performed, because statcally typed language is ``main'' and may have few controlled virtual machines, or be multithreaded.
 \subsection{Arrays}
 % https://wiki.python.org/jython/CollectionsIntegration
-They face same problem as strings: types are not same, but from perspective of dynamically typed language it is mostly imperceptable, because of duck typing (if language-specific API is exposed). But things are worse for statically typed languages: dynamically typed array may contain any values, while statically typed only given subtypes. Also, covariance and contravariance is erased on level of bytecode, which can break statically typed language if handled incorrectly. Other implementations (jython) also forbid such conversions.
+They face same problem as strings: types are not same, but from perspective of dynamically typed language it is mostly imperceptible, because of duck typing (if language-specific API is exposed). But things are worse for statically typed languages: dynamically typed array may contain any values, while statically typed only given subtypes. Also, covariance and contravariance is erased on level of bytecode, which can break statically typed language if handled incorrectly. Other implementations (jython) also forbid such conversions.
 \subsection{Returning primitive types from dynamically typed functions}
+As \texttt{any} type can't be stored on statically typed side, one of following strategies can be used:\\
+\begin{itemize}
+	\item always return instance of some \texttt{TaggedValue}, which has two fields: one of type \texttt{uint64} to hold original \texttt{any} value (which may be invalidated in case of a reference type, but tag will remain same) and field of type \texttt{SomeObject} (with null value for primitive return types). Providing functions to pattern match on tags will cover all use cases
+	\item in case of primitive types, return their ``boxed'' version. While in former case we could make that ``return value'' first argument and avoid allocation, here creating a small object is inevitable. As well, it is not trivial how to handle other ``empty'' values (such as \texttt{undefined}), they can be either coerced to null (as they usually represent \texttt{void} return type, which boxed version has only one valid value~--- null) or return preallocated objects, as \texttt{Unit} in Kotlin. Performing type checks on boxed types is as simple as asserting not-null, loading class value and comparing to a constant, as their classes are sealed.
+\end{itemize}
 \subsection{Inheritance}
 \subsection{Null}
-Attentive reader could notice, that type system extension with new tag on dynamic side introduced yet another \texttt{null} value.
+Attentive reader could notice, that type system extension with new tag on dynamic side introduced yet another \texttt{null} value, which shows flaws of NaN-boxing approach compared to one used by Graal VM: plain boxing to Java's ``boxed'' types.
 
 \chapterconclusion
 As we can see, there is always a tradeoff between performance and ease of use.
 
 \chapter{RESULTS}
+
+\section{Benefits from having different language runtimes and bytecodes}
+While projects like Graal VM optimize language developer productivity without losing peak performance, real projects have more characteristics to measure, such as memory usage, startup time and interpretation speed. Having entire abstract syntax tree in heap memory may be impermissible on mobile platforms in browser, this topic is discussed in \cite{ignition-iterpreter}
+% https://v8.dev/blog/cost-of-javascript-2019
+
+\section{Benchmarks}
+\TODO
 
 \chapterconclusion
 
@@ -402,8 +427,14 @@ As we can see, there is always a tradeoff between performance and ease of use.
 
 %% Макрос для заключения. Совместим со старым стилевиком.
 \startconclusionpage
+In the course of work subject following results were achieved:
+\begin{enumerate}
+	\item area overview was conducted, which covered numerous amount of existing solutions for different languages and platforms.
+	\item solution for each of related components of the virtual machine, including memory management, interpreter and just in time compiler was proposed
+	\item code that demonstrates applicability was written
+	\item performance measurements have been taken\TODO
+\end{enumerate}
 
-В данном разделе размещается заключение.
 
 \printmainbibliography
 
