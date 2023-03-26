@@ -1,0 +1,78 @@
+\documentclass{beamer}
+
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
+\setmainfont[Ligatures={TeX,Historic}]{Times New Roman}
+\setsansfont{Arial}
+\setmonofont{Courier New}
+
+\usepackage[english,russian]{babel}
+
+\title{Поддержка вызова методов и передачи объектов между языками со статическими и динамическими типизациями на платформе Ark}
+\author{Прокопенко К.Д.}
+%\institute{}
+\date{2023}
+
+\begin{document}
+
+\addtobeamertemplate{navigation symbols}{}{%
+	\usebeamerfont{footline}%
+	\usebeamercolor[fg]{footline}%
+	\hspace{1em}%
+	\insertframenumber/\inserttotalframenumber
+}
+
+\AtBeginSection[]{
+	\begin{frame}
+	\vfill
+	\centering
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		\usebeamerfont{title}\insertsectionhead\par%
+	\end{beamercolorbox}
+	\vfill
+	\end{frame}
+}
+
+\frame{\titlepage}
+
+\begin{frame}{Outline}
+	\tableofcontents
+\end{frame}
+
+\section{Обзор}
+
+\begin{frame}
+\frametitle{Актуальность}
+\begin{itemize}
+	\item Переиспользование
+	\item Гибкость решений
+	\item Кооперация
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Существующие решения}
+\begin{itemize}
+	\item Нативный-нативный
+		\begin{itemize}
+			\item{C++, Zig, Carbon}
+		\end{itemize}
+	\item Управляемый-нативный
+		\begin{itemize}
+			\item{FFI (Haskell, python, \dots)}
+			\item{JNI, Project Panama}
+			\item{LuaJIT}
+			\item{CPPYY}
+		\end{itemize}
+	\item Управляемый-управляемый
+		\begin{itemize}
+			\item{JVM/.NET}
+			\begin{itemize}
+				\item{Nashorn}
+				\item{Graal VM}
+			\end{itemize}
+		\end{itemize}
+\end{itemize}
+\end{frame}
+
+\end{document}
