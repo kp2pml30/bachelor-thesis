@@ -144,12 +144,7 @@
 его уже использовали некоторые бакалавры и магистры. Надеюсь на продолжение.}
 
 %%% Гранты, полученные при выполнении работы
-\researchfunding{Автор разрабатывал этот стилевик исключительно за свой счет и на
-добровольных началах. Однако значительная его часть была бы невозможна, если бы
-автор не написал в свое время кандидатскую диссертацию в \LaTeX,
-а также не отвечал за формирование кучи научно-технических отчетов по гранту,
-известному как <<5-в-100>>, что происходило при государственной финансовой поддержке
-ведущих университетов Российской Федерации (субсидия 074-U01).}
+\researchfunding{Данная работа выполнялась во время работы в некоторой компании. Гранты получены не были.}
 
 %%% Наличие публикаций и выступлений на конференциях по теме выпускной работы
 \researchpublications{По теме этой работы я (к счастью!) ничего не публиковал.
@@ -305,33 +300,38 @@ Graal VM вызывает самую специфическую версию, т
 	\resizebox{\textwidth}{!}{
 		\begin{tabular}{ |c|c| }
 			\hline
-			Old & New \\
+			Старая & Новая \\
 			\hline
 			\includesvg{build/res/dot/marker_was.dot} & \includesvg{build/res/dot/marker_new.dot} \\
 			\hline
 		\end{tabular}
 	}
 \end{figure}
-\subsection{Iterating stacks}
-As stack-iterating depends only on type of method (dynamic/static), which is stored in every frame, modifications of stack scanning are not needed. However, as two ``thread states'' share same stack, additional check, that checks that state is topmost must be added. It can be performed using that ``address'', i.e. value located in that thread local variable equals to examined thread. As they are accessed only during stop-the world phases (such as ``initial mark pause'' and ``remark pause''), it does not introduce data race.
-\subsection{Keeping references}
-Fields and classes data, stored in profile info must be non-movable, because just in time compiler works concurrently and doesn't have access to runtime, and may be permanent, to keep equality semantics. To implement this, new virtual-machine level root objects are added, that map pointers to NaN boxed values.
+\subsection{Обход стеков}
+Т.к. представление объектов на стеке зависит только от метода, для которого известно динамический ли он, и который хранится в каждом стековом кадре, модификации алгоритма сканирования не требуются. Однако, т.к. два состояния потока находятся на одном реальном стеке, необходимо проверить кто из них сейчас активен (и является самым верхним). Это можно сделать за счет той переменной, добавленной для поддержки консистентности регистра потока и переменной: если значение переменной совпадает с исследуемым потоком, то он активен. Поскольку стек обходиться только во время фаз ``остановки мира'' (таких как ``initial mark pause'' и ``remark pause''), гонки данных не появляется.
 
-\section{Challenges}
-\subsection{Strings}
-As their in memory layout is different, copying is required. As they are immutable in most languages, dynamically typed string may have a pointer to alternate string from a statically typed context, which will be lazily initialized on request. Other transformation can't be performed, because statcally typed language is ``main'' and may have few controlled virtual machines, or be multithreaded.
-\subsection{Arrays}
+\section{Вызовы}
+\subsection{Строки}
+Т.к. их представления в памяти различны, необходимо копирование. Благодаря неизменяемости в большинстве языков, можно было бы добавить указатель из динамически типизированной строки к обычной, который затем лениво инициализировать. Обратная трансформация не может быть осуществлена из-за многопоточности и того, что статический язык может быть связан с несколькими динамическими. Однако, благодаря тому, что это инородный объект, многие методы будут все так же доступны.
+
+\subsection{Массивы}
 % https://wiki.python.org/jython/CollectionsIntegration
+Массивы сталкиваются с проблемами аналогичными строкам: разные типы. Однако, динамическому языку это может быть не заметно благодаря ``утиной'' типизации, если языко-специфичный интерфейс предоставлен на ряду с обычным. С другой стороны, возникают проблемы с вариантностью для типизированного массива, поскольку эта информация может теряться на уровне байткода.\\
+Другие реализации, такие как jython, запрещают конверсии массивов
 They face same problem as strings: types are not same, but from perspective of dynamically typed language it is mostly imperceptible, because of duck typing (if language-specific API is exposed). But things are worse for statically typed languages: dynamically typed array may contain any values, while statically typed only given subtypes. Also, covariance and contravariance is erased on level of bytecode, which can break statically typed language if handled incorrectly. Other implementations (jython) also forbid such conversions.
-\subsection{Returning primitive types from dynamically typed functions}
-As \texttt{any} type can't be stored on statically typed side, one of following strategies can be used:\\
+
+\subsection{Возвращение экземпляров примитивных типов из динамически типизированных функций.}
+Так как тип \texttt{any} не может быть представлен на статически типизированной стороне из-за несоответствия представления объектов, одна из следующих стратегий может быть использована:
 \begin{itemize}
-	\item always return instance of some \texttt{TaggedValue}, which has two fields: one of type \texttt{uint64} to hold original \texttt{any} value (which may be invalidated in case of a reference type, but tag will remain same) and field of type \texttt{SomeObject} (with null value for primitive return types). Providing functions to pattern match on tags will cover all use cases
-	\item in case of primitive types, return their ``boxed'' version. While in former case we could make that ``return value'' first argument and avoid allocation, here creating a small object is inevitable. As well, it is not trivial how to handle other ``empty'' values (such as \texttt{undefined}), they can be either coerced to null (as they usually represent \texttt{void} return type, which boxed version has only one valid value~--- null) or return preallocated objects, as \texttt{Unit} in Kotlin. Performing type checks on boxed types is as simple as asserting not-null, loading class value and comparing to a constant, as their classes are sealed.
+	\item всегда возвращать некоторый \texttt{TaggedValue}, который имел бы два поля: \texttt{uint64} для сохранения изначального значения \texttt{any} (и который может стать некорректным в случае перемещения объекта, однако информация о типе останется верной) и поля типа \texttt{SomeObject}, в котором хранилась бы ссылка на объект или \texttt{null} в случае примитивного значения. Затем, предоставление всего набора функций для проверки принадлежности и преобразований, покрыло бы все возможные использования. При этом подходе, можно было бы избежать аллокации при помощи передачи \texttt{TaggedValue} как аргумента для заполнения, вместо возвращаемого значения.
+	\item В случае примитивных типов возвращать их запакованные версии. При данном подходе аллокация в общем случае неизбежна, однако проверка типа будет сводиться проверке на \texttt{null}, загрузке указателя на класс и сравнению, т.к. примитивные типы нельзя расширять. Оптимизирующий компилятор в случае нескольких проверок подряд может выделить общий код, чем практически приравняет сложность проверки к ложности в предыдущем случае.
 \end{itemize}
-\subsection{Inheritance}
+Т.к. второй подход более идиоматичный, выбирается именно он. Благодаря этому месту можно заметить недостаток разного представления объектов, которого нет, например, в Graal VM.
+\subsection{Наследование}
+\TODO
 \subsection{Null}
-Attentive reader could notice, that type system extension with new tag on dynamic side introduced yet another \texttt{null} value, which shows flaws of NaN-boxing approach compared to one used by Graal VM: plain boxing to Java's ``boxed'' types.
+Внимательный читатель мог заметить, что расширение системы типов новым тегом на динамически типизированной стороне не прошло незамеченным: появился еще один \texttt{null}, что указывает на некоторые недостатки использования NaN упаковки вместо способа который использует Graal VM: простой запаковки примитивов в их объектные аналоги.\\
+Помимо этого, существует несколько способов ``борьбы'' с ``пустыми'' значениями из динамического языка (например, во что должен превращаться \texttt{undefined}): они все могут преобразовываться к \texttt{null}, либо быть представлены аналогично \texttt{Unit} из языка Kotlin: константными ссылочными значением. Первый способ не уступает второму, поскольку \texttt{undefined} чаще всего означает отсутствие возвращаемого значения, а, например, в Java, запаковынный тип \texttt{Void} представляется единственным значением ~--- \texttt{null}.
 
 \chapterconclusion
 Можно заметить, что зачастую ставится вопрос о выборе между производительностью и удобством использования.
