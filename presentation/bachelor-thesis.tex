@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[table]{beamer}
 
 \usepackage{fontspec}
 \defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
@@ -7,11 +7,34 @@
 \setmonofont{Courier New}
 
 \usepackage[english,russian]{babel}
+\usepackage{svg}
+\usepackage{pifont}
+\usepackage{tikz}
 
 \title{Поддержка вызова методов и передачи объектов между языками со статическими и динамическими типизациями на платформе Ark}
 \author{Прокопенко К.Д.}
 %\institute{}
 \date{2023}
+
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\newcommand\tikznode[3][]%
+{\tikz[remember picture,baseline=(#2.base)]%
+	\node[minimum size=0pt,inner sep=0pt,#1](#2){#3};%
+}%
+
+\makeatletter
+\def\rowcolor{{\ifnum0=`}\fi\bmr@rowcolor}
+\newcommand<>{\bmr@rowcolor}{%
+	\alt#1%
+		{\global\let\CT@do@color\CT@@do@color\@ifnextchar[\CT@rowa\CT@rowb}%
+		{\ifnum0=`{\fi}\@gooble@rowcolor}%
+}
+\newcommand{\@gooble@rowcolor}[2][]{\@gooble@rowcolor@}
+	\newcommand{\@gooble@rowcolor@}[1][]{\@gooble@rowcolor@@}
+	\newcommand{\@gooble@rowcolor@@}[1][]{\ignorespaces}
+\makeatother
 
 \begin{document}
 
@@ -73,6 +96,205 @@
 			\end{itemize}
 		\end{itemize}
 \end{itemize}
+\end{frame}
+
+\section{Представление объектов}
+
+\subsection{NaN упаковка}
+
+\begin{frame}
+\frametitle{Общая идея}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+число бит & 1 & 11 & \multicolumn{3}{c|}{52} \\
+\hline
+значение & знак & экспонента & \multicolumn{3}{c|}{мантисса} \\
+\hline
+NaN & знак & 1\dots 1 & \multicolumn{3}{c|}{мантисса} \\
+\hline
+qNaN indefinite & знак & 1\dots 1 & 1 & \multicolumn{2}{c|}{0\dots0} \\
+\hline
+кодирование & знак & 1\dots 1 & 1 & тэг & значение \\
+\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{реализация в Ark}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+число бит & 16 & 48 \\
+\hline
+значение & ``тэг'' & нагрузка \\
+\hline
+object & \texttt{0000} & указатель \\
+\hline
+float64 & \begin{tabular}{c} \texttt{0001} \\ ---- \\ \texttt{fffe} \end{tabular} & \dots \\
+\hline
+int32 & \texttt{ffff} & int32 \\
+\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{расширение в Ark}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+число бит & 16 & \multicolumn{2}{c|}{48} \\
+\hline
+значение & \multicolumn{2}{c}{``тэг''} & нагрузка \\
+\hline
+object & \texttt{0000} & \texttt{0} & указатель \\
+\hline
+foreign object & \texttt{0000} & \texttt{1} & указатель \\
+\hline
+float64 & \begin{tabular}{c} \texttt{0001} \\ ---- \\ \texttt{fffe} \end{tabular} & \multicolumn{2}{c|}{\dots} \\
+\hline
+int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
+\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Как представить статические поля и методы?}
+\pause
+Полиморфизм по типу объекта: если он является объектом класса, то осуществлять доступ к статическим сущностям.
+\end{frame}
+
+\subsection{На статически типизированной стороне}
+
+\begin{frame}
+	\frametitle{Новая иерархия классов}
+	\begin{center}
+		\includesvg{build/res/dot/statically-typed-tree.dot}
+	\end{center}
+\end{frame}
+
+\section{Управление потоками}
+
+\begin{frame}
+\frametitle{Состояние потока}
+\begin{itemize}
+	\item Инкапсулирует данные необходимые для исполнения
+	\item Хранится в переменной локльной для потока или в регистре
+	\item Добавляется новый переход
+	\pause
+	\begin{itemize}
+		\item необходимо переключать в мостах
+		\item отсутствие гонок данных
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\section{Вызов методов}
+
+\begin{frame}
+\frametitle{На статически типизированной стороне}
+\begin{itemize}
+	\item[\xmark] Встраиваемые кэши
+	\item[\cmark] ``MethodHandle''
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{На динамически типизированной стороне}
+\begin{itemize}
+	\item[] \tikznode{V1}var.fu\tikznode{F1}nc(a\tikznode{A1}rg)
+	\item[]
+	\item[] (var.fu\tikznode{F2}nc)(this=v\tikznode{V2}ar, a\tikznode{A2}rg)
+\end{itemize}
+\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+	\draw[->] (A1.south) -- (A2.north);
+	\draw[->] (F1.south) -- (F2.north);
+	\draw[->] (V1.south) -- (V2.north);
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
+\frametitle{Упрощенные преобразования}
+\begin{tabular}{|c|c|c|c|}
+№ & инструкция & ввод & пользователи \\
+0 & Register Var & & 2 \\
+1 & Register Arg & & 0 \\
+\rowcolor<1->{lime}2 & LoadByName "func" & 0 & 3 \\
+\rowcolor<1->{lightgray}3 & CallDynThis & 2, 0, 1 &
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\begin{tabular}{|c|c|c|c|}
+№ & инструкция & ввод & пользователи \\
+0 & Register Var & & 2, 5 \\
+1 & Register Arg & & 0 \\
+\rowcolor{lime}2 & DeoptimizeIfNotInstance "Klass" & 0 & \only<2>{7} \\
+\rowcolor<2>{red}\rowcolor<1>{lime}3 & Constant "func\_const" & & \\
+\rowcolor<2>{red}\rowcolor<1>{lightgray}4 & DeoptimizeIfNE "func\_const" & 3 & \\
+\rowcolor<2>{red}\rowcolor<1>{lightgray}5 & DeoptimizeIfNotInstance "Klass" & 0 & \only<1>{7} \\
+\rowcolor{lightgray}6 & DeoptimizeIfNotNumber & 1 & 7 \\
+\rowcolor{lightgray}7 & CallVirtual "Klass.func" & \only<1>{5}\only<2>{2}, 6 &
+\end{tabular}
+\end{frame}
+
+\begin{frame}
+\frametitle{Перегрузка методов в динамически типизированных языках}
+\begin{itemize}
+	\item по числу аргументов (elixir, erlang)
+	\item по типам аргументов (typescript?)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Перегрузка методов в GraalVM}
+	Что вызовет \texttt{foo(1)} вызванное из динамически типизированного языка?\\
+	\begin{enumerate}
+		\item \texttt{void foo(double);}
+		\item \texttt{void foo(int);}
+		\item \texttt{void foo(char);}
+	\end{enumerate}
+	\pause
+	Ответ: 3
+\end{frame}
+
+\section{Управление памятью}
+
+\begin{frame}
+\frametitle{Обход стека}
+\begin{itemize}
+	\item определение типа метода
+	\item выбор стеков из состояний потока
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Иерархия маркеров --- старая}
+\begin{center}
+\includesvg{build/res/dot/marker_was.dot}
+\end{center}
+\end{frame}
+\begin{frame}
+\frametitle{Иерархия маркеров --- новая}
+\begin{center}
+\scalebox{0.6}{
+\includesvg{build/res/dot/marker_new.dot}
+}
+\end{center}
+\end{frame}
+
+\begin{frame}
+	\vfill
+	\centering
+	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+		\usebeamerfont{title}Спасибо за внимание
+		\only<2>{\\ Вопросы?}
+	\end{beamercolorbox}
+	\vfill
 \end{frame}
 
 \end{document}
