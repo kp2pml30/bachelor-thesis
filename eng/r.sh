@@ -11,8 +11,8 @@ trap 'popd 2> /dev/null' EXIT
 PROJ="bachelor-thesis"
 
 function xelat() {
-    echo "proj $PROJ"
-    xelatex -shell-escape -output-directory=build "$PROJ"
+    echo "proj $PROJ $ARGS"
+    xelatex -shell-escape -output-directory=build "$ARGS" "\input{$PROJ}"
 }
 
 function build() {
@@ -24,7 +24,11 @@ function build() {
     xelat
 }
 
-case "$1" in
+MODE="$1"
+shift
+ARGS="$@"
+
+case "$MODE" in
 clean)
     rm -f {bachelor-thesis,master-thesis,master-thesis-en}.{bib,aux,log,bbl,bcf,blg,run.xml,toc,tct,pdf,out}
     rm -rf build

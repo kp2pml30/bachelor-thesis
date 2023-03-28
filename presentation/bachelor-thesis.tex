@@ -1,4 +1,4 @@
-\documentclass[table]{beamer}
+\documentclass[xcolor=table, aspectratio=169]{beamer}
 
 \usepackage{fontspec}
 \defaultfontfeatures{Ligatures={TeX},Renderer=Basic}
@@ -10,19 +10,24 @@
 \usepackage{svg}
 \usepackage{pifont}
 \usepackage{tikz}
+\usepackage{ifthen}
+\usepackage{ulem}
+\usepackage{listings}
 
-\title{Поддержка вызова методов и передачи объектов между языками со статическими и динамическими типизациями на платформе Ark}
-\author{Прокопенко К.Д.}
-%\institute{}
+\usepackage{ITMOtheme}
+
+\title[Межъязыковое взаимодействие на платформе Ark]{Поддержка вызова методов и передачи объектов между языками со статическими и динамическими типизациями на платформе Ark}
+\ifthenelse{\equal{\presMode}{full}}{
+	\author{Прокопенко К.Д.}
+	\institute{Open Harmony}
+	} {
+	\author{Прокопенко К.Д.\\руководитель: Фильченков А.А.\\консультант: Соломенников Д.И.}
+	\institute{ITMO}
+}
 \date{2023}
 
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
-
-\newcommand\tikznode[3][]%
-{\tikz[remember picture,baseline=(#2.base)]%
-	\node[minimum size=0pt,inner sep=0pt,#1](#2){#3};%
-}%
 
 \makeatletter
 \def\rowcolor{{\ifnum0=`}\fi\bmr@rowcolor}
@@ -36,30 +41,70 @@
 	\newcommand{\@gooble@rowcolor@@}[1][]{\ignorespaces}
 \makeatother
 
-\begin{document}
+\setfootlinetext{\insertsection\ifthenelse{\equal{\insertsubsection}{}}{}{/\insertsubsection}}
 
-\addtobeamertemplate{navigation symbols}{}{%
-	\usebeamerfont{footline}%
-	\usebeamercolor[fg]{footline}%
-	\hspace{1em}%
-	\insertframenumber/\inserttotalframenumber
+\lstdefinelanguage{etspseudo}{
+	keywords={let, const, typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywords={class, export, boolean, throw, implements, import, this, void, int, long},
+	ndkeywordstyle=\color{purple}\bfseries,
+	identifierstyle=\color{black},
+	sensitive=false,
+	comment=[l]{//},
+	morecomment=[s]{/*}{*/},
+	commentstyle=\color{purple}\ttfamily,
+	stringstyle=\color{red}\ttfamily,
+	morestring=[b]',
+	morestring=[b]"
 }
 
-\AtBeginSection[]{
-	\begin{frame}
-	\vfill
-	\centering
-	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		\usebeamerfont{title}\insertsectionhead\par%
-	\end{beamercolorbox}
-	\vfill
+\lstset{
+	showtabs=true,
+	breaklines=true,
+	language=etspseudo,
+}
+
+\begin{document}
+
+\tikzstyle{every picture}+=[remember picture]
+\tikzstyle{na}=[shape=rectangle,inner sep=0pt,text depth=0pt]
+
+\AtBeginSection[]
+{
+	\begin{frame}[plain, noframenumbering]
+		\frametitle{Outline}
+		\Large
+		\tableofcontents[currentsection]
 	\end{frame}
 }
 
-\frame{\titlepage}
+\AtBeginSubsection[]
+{
+	\begin{frame}[plain, noframenumbering]
+		\frametitle{Outline}
+		\Large
+		\tableofcontents[currentsection, currentsubsection]
+	\end{frame}
+}
 
-\begin{frame}{Outline}
-	\tableofcontents
+% \setcounter{tocdepth}{1}
+
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+%\begin{frame}{Outline}
+%	\tableofcontents
+%\end{frame}
+
+\section{Цели работы}
+\begin{frame}
+\begin{itemize}
+	\item Исследование существующих решений в области межъязыкового взаимодействия
+	\item Выделение затрагиваемых компонент платформы
+	\item Реализация прототипа
+	\item Оценка результатов
+\end{itemize}
 \end{frame}
 
 \section{Обзор}
@@ -132,7 +177,7 @@ qNaN indefinite & знак & 1\dots 1 & 1 & \multicolumn{2}{c|}{0\dots0} \\
 \hline
 object & \texttt{0000} & указатель \\
 \hline
-float64 & \begin{tabular}{c} \texttt{0001} \\ ---- \\ \texttt{fffe} \end{tabular} & \dots \\
+float64 & \begin{tabular}{c} \texttt{0001} \\ --- \\ \texttt{fffe} \end{tabular} & \dots \\
 \hline
 int32 & \texttt{ffff} & int32 \\
 \hline
@@ -181,13 +226,13 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \begin{frame}
 \frametitle{Состояние потока}
 \begin{itemize}
-	\item Инкапсулирует данные необходимые для исполнения
+	\item Инкапсулирует данные необходимые для исполнения языка
 	\item Хранится в переменной локльной для потока или в регистре
-	\item Добавляется новый переход
+	\item Должно быть консистентно
 	\pause
 	\begin{itemize}
 		\item необходимо переключать в мостах
-		\item отсутствие гонок данных
+		\item не должны появляться гонки данных
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -203,73 +248,139 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{На динамически типизированной стороне}
-\begin{itemize}
-	\item[] \tikznode{V1}var.fu\tikznode{F1}nc(a\tikznode{A1}rg)
-	\item[]
-	\item[] (var.fu\tikznode{F2}nc)(this=v\tikznode{V2}ar, a\tikznode{A2}rg)
-\end{itemize}
-\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
-	\draw[->] (A1.south) -- (A2.north);
-	\draw[->] (F1.south) -- (F2.north);
-	\draw[->] (V1.south) -- (V2.north);
-\end{tikzpicture}
-\end{frame}
+\subsection{На динамически типизированной стороне}
 
-\begin{frame}
-\frametitle{Упрощенные преобразования}
-\begin{tabular}{|c|c|c|c|}
-№ & инструкция & ввод & пользователи \\
-0 & Register Var & & 2 \\
-1 & Register Arg & & 0 \\
-\rowcolor<1->{lime}2 & LoadByName "func" & 0 & 3 \\
-\rowcolor<1->{lightgray}3 & CallDynThis & 2, 0, 1 &
+\subsection{Пример}
+
+\begin{frame}[fragile]
+\frametitle{Данные}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Статический & Динамический \\
+\hline
+\begin{lstlisting}
+class Klass {
+  func(a: int): void
+  func(): void
+}
+\end{lstlisting} &
+\begin{lstlisting}
+let ins /* : Klass */
+let arg /* : number */
+\end{lstlisting} \\
+\hline
+\multicolumn{2}{|c|}{\texttt{ins.func(arg)}}\\
+\hline
+\begin{lstlisting}
+Klass.func.virtual(
+  ins,
+  arg
+)
+\end{lstlisting} & \only<2>{\cellcolor{lime}}\begin{lstlisting}
+ins['func'](
+  this=ins,
+  args=(arg,)
+)
+\end{lstlisting} \\
+\hline
 \end{tabular}
+\end{center}
+
+%\begin{itemize}
+%	\item[] \tikz\node[na](V1){ins};.\tikz\node[na](F1){func};(\tikz\node[na](A1){arg};)
+%	\item[]
+%	\item[] (\tikz\node[na](V3){ins};[\tikz\node[na](F2){`func'};])(this=\tikz\node[na](V2){ins};, args=[\tikz\node[na](A2){arg};])
+%\end{itemize}
+%\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+%	\draw[->] (A1.south) -- (A2.north);
+%	\draw[->] (F1.south) -- (F2.north);
+%	\draw[->] (V1.south) -- (V2.north);
+%	\draw[->] (V1.south) -- (V3.north);
+%\end{tikzpicture}
+
 \end{frame}
 
 \begin{frame}
+\frametitle{Промежуточное представление}
+\begin{center}
 \begin{tabular}{|c|c|c|c|}
+\hline
 № & инструкция & ввод & пользователи \\
+\hline
+0 & Register Ins & & 2 \\
+1 & Register Arg & & 0 \\
+\rowcolor<1->{lime}2 & LoadByName ``func'' & 0 & 3 \\
+\rowcolor<1->{lightgray}3 & CallDynThis & 2, 0, 1 &\\
+\hline
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Оптимизация}
+\begin{center}
+\begin{tabular}{|c|c|c|r|}
+\hline
+№ & инструкция & ввод & пользователи \\
+\hline
 0 & Register Var & & 2, 5 \\
 1 & Register Arg & & 0 \\
-\rowcolor{lime}2 & DeoptimizeIfNotInstance "Klass" & 0 & \only<2>{7} \\
-\rowcolor<2>{red}\rowcolor<1>{lime}3 & Constant "func\_const" & & \\
-\rowcolor<2>{red}\rowcolor<1>{lightgray}4 & DeoptimizeIfNE "func\_const" & 3 & \\
-\rowcolor<2>{red}\rowcolor<1>{lightgray}5 & DeoptimizeIfNotInstance "Klass" & 0 & \only<1>{7} \\
+\rowcolor{lime}\tikz\node[na](DEOPTKLASS){2}; & DeoptimizeIfNotInstance "Klass" & 0 & \only<3>{7} \\
+\rowcolor<3>{red}\rowcolor<-2>{lime}\tikz\node[na](CONST){3}; & Constant "func\_const" & & 4\\
+\rowcolor<3>{red}\rowcolor<-2>{lightgray}\tikz\node[na](DEOPT){4}; & DeoptimizeIfNE "func\_const" & 3 &\\
+\rowcolor<3>{red}\rowcolor<-2>{lightgray}\tikz\node[na](DEOPTKLASS2){5}; & DeoptimizeIfNotInstance "Klass" & 0 & \only<-2>{7} \\
 \rowcolor{lightgray}6 & DeoptimizeIfNotNumber & 1 & 7 \\
-\rowcolor{lightgray}7 & CallVirtual "Klass.func" & \only<1>{5}\only<2>{2}, 6 &
+\rowcolor{lightgray}7 & CallVirtual "Klass.func/1" & \only<-2>{5}\only<3>{2}, 6 &\\
+\hline
 \end{tabular}
+\end{center}
+\only<2>{
+\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+	\draw[->, color=black] (CONST.west) to [bend right=45] (DEOPT.west);
+	\draw[->, color=black] (DEOPTKLASS.west) to [bend right=60] (DEOPTKLASS2.west);
+\end{tikzpicture}
+}
 \end{frame}
 
 \begin{frame}
-\frametitle{Перегрузка методов в динамически типизированных языках}
+\frametitle{Перегрузка методов}
 \begin{itemize}
 	\item по числу аргументов (elixir, erlang)
 	\item по типам аргументов (typescript?)
+	\item \sout{по аттрибутам \texttt{this}}
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Перегрузка методов в GraalVM}
-	Что вызовет \texttt{foo(1)} вызванное из динамически типизированного языка?\\
+	Что вызовет \texttt{foo(1)}?\\
 	\begin{enumerate}
 		\item \texttt{void foo(double);}
 		\item \texttt{void foo(int);}
 		\item \texttt{void foo(char);}
 	\end{enumerate}
 	\pause
-	Ответ: 3
+	Ответ:
+	\begin{itemize}
+		\item Из статически типизированного языка --- 2
+		\item Из динамически типизированного языка --- 3
+	\end{itemize}
 \end{frame}
 
 \section{Управление памятью}
 
 \begin{frame}
 \frametitle{Обход стека}
-\begin{itemize}
-	\item определение типа метода
-	\item выбор стеков из состояний потока
-\end{itemize}
+\begin{enumerate}
+	\item Обход стеков
+	\begin{enumerate}
+		\item определение типа метода
+		\item выбор стеков из состояний потока
+	\end{enumerate}
+	\item Маркировка объектов
+\end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -287,14 +398,14 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{center}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[plain]
+\itmopolygons{
 	\vfill
-	\centering
-	\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-		\usebeamerfont{title}Спасибо за внимание
-		\only<2>{\\ Вопросы?}
-	\end{beamercolorbox}
+	\Huge{Спасибо за внимание}
+	\only<2>{\\ Вопросы?}
 	\vfill
+	%\includegraphics[scale=.5]{itmo/slogan.pdf}
+}
 \end{frame}
 
 \end{document}
