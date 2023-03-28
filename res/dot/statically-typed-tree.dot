@@ -1,6 +1,6 @@
 digraph G {
 	node [shape=rect];
-	SomeObject [label="sealed SomeObject"];
+	SomeObject [label=<<font color="blue">sealed</font> SomeObject>];
 	SomeObject -> Object;
 	SomeObject -> ScriptObject;
 }

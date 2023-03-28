@@ -29,6 +29,18 @@
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
 
+\let\SlidesAtEnd\empty
+
+\ifthenelse{\equal{\presMode}{full}}{%
+\newcommand{\MoveSlideToEnd}[1]{#1}%
+} {%
+\newcommand{\MoveSlideToEnd}[1]{
+	\let\OldSlidesAtEnd\SlidesAtEnd
+	\def\TmpSlidesAtEnd{\OldSlidesAtEnd #1}
+	\let\SlidesAtEnd\TmpSlidesAtEnd
+}%
+}
+
 \makeatletter
 \def\rowcolor{{\ifnum0=`}\fi\bmr@rowcolor}
 \newcommand<>{\bmr@rowcolor}{%
@@ -46,7 +58,7 @@
 \lstdefinelanguage{etspseudo}{
 	keywords={let, const, typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
 	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={class, export, boolean, throw, implements, import, this, void, int, long},
+	ndkeywords={class, export, boolean, throw, implements, import, this, void, int, long, short, double},
 	ndkeywordstyle=\color{purple}\bfseries,
 	identifierstyle=\color{black},
 	sensitive=false,
@@ -64,6 +76,14 @@
 	language=etspseudo,
 }
 
+\makeatletter
+\patchcmd{\beamer@sectionintoc}
+	{\vfill}
+	{\vskip-\itemsep}
+	{}
+	{}
+\makeatother
+
 \begin{document}
 
 \tikzstyle{every picture}+=[remember picture]
@@ -73,8 +93,9 @@
 {
 	\begin{frame}[plain, noframenumbering]
 		\frametitle{Outline}
-		\Large
-		\tableofcontents[currentsection]
+		%\Large
+		\small
+		\tableofcontents[currentsection, hideallsubsections]
 	\end{frame}
 }
 
@@ -82,23 +103,17 @@
 {
 	\begin{frame}[plain, noframenumbering]
 		\frametitle{Outline}
-		\Large
-		\tableofcontents[currentsection, currentsubsection]
+		\small
+		\tableofcontents[currentsection, currentsubsection, subsectionstyle=show/shaded/hide]
 	\end{frame}
 }
-
-% \setcounter{tocdepth}{1}
 
 \begin{frame}[plain]
 	\titlepage
 \end{frame}
 
-%\begin{frame}{Outline}
-%	\tableofcontents
-%\end{frame}
-
-\section{Цели работы}
 \begin{frame}
+\frametitle{Цели работы}
 \begin{itemize}
 	\item Исследование существующих решений в области межъязыкового взаимодействия
 	\item Выделение затрагиваемых компонент платформы
@@ -112,9 +127,10 @@
 \begin{frame}
 \frametitle{Актуальность}
 \begin{itemize}
-	\item Переиспользование
+	\item Переиспользование кода
 	\item Гибкость решений
 	\item Кооперация
+	\item Упрощение найма сотрудников
 \end{itemize}
 \end{frame}
 
@@ -125,6 +141,7 @@
 		\begin{itemize}
 			\item{C++, Zig, Carbon}
 		\end{itemize}
+	\pause
 	\item Управляемый-нативный
 		\begin{itemize}
 			\item{FFI (Haskell, python, \dots)}
@@ -132,15 +149,28 @@
 			\item{LuaJIT}
 			\item{CPPYY}
 		\end{itemize}
+	\pause
 	\item Управляемый-управляемый
 		\begin{itemize}
 			\item{JVM/.NET}
 			\begin{itemize}
+				\item{Kotlin, Scala}
 				\item{Nashorn}
 				\item{Graal VM}
 			\end{itemize}
 		\end{itemize}
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Особенности платформы Ark}
+Наличие нескольких виртуальных машин влечет следующее:
+\begin{enumerate}
+	\item Различные среды исполнения
+	\item Различные наборы инструкций
+	\item Различное представление данных
+\end{enumerate}
+Однако, компоненты имеют обобщенные фрагменты
 \end{frame}
 
 \section{Представление объектов}
@@ -149,6 +179,7 @@
 
 \begin{frame}
 \frametitle{Общая идея}
+Представление число с плавающей точкой двойной точности
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -167,7 +198,7 @@ qNaN indefinite & знак & 1\dots 1 & 1 & \multicolumn{2}{c|}{0\dots0} \\
 \end{frame}
 
 \begin{frame}
-\frametitle{реализация в Ark}
+\frametitle{Реализация в Ark}
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -186,7 +217,7 @@ int32 & \texttt{ffff} & int32 \\
 \end{frame}
 
 \begin{frame}
-\frametitle{расширение в Ark}
+\frametitle{Расширение в Ark}
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -206,10 +237,23 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{center}
 \end{frame}
 
+\subsection{На динамически типизированной стороне}
+
 \begin{frame}
-\frametitle{Как представить статические поля и методы?}
-\pause
-Полиморфизм по типу объекта: если он является объектом класса, то осуществлять доступ к статическим сущностям.
+\frametitle{Представление объектов на динамически типизирвоанной стороне}
+\begin{itemize}
+	\item[] Как представить ``инородный'' объект?
+	\pause
+	\begin{itemize}
+		\item[] Новым тегом
+	\end{itemize}
+	\pause
+	\item[] Как представить статические поля и методы?
+	\pause
+	\begin{itemize}
+		\item[] Полиморфизмом по типу объекта
+	\end{itemize}
+\end{itemize}
 \end{frame}
 
 \subsection{На статически типизированной стороне}
@@ -221,6 +265,11 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 	\end{center}
 \end{frame}
 
+\ifthenelse{\equal{\presMode}{full}}{
+	\section{``Присваивающее действие''}
+} {
+}
+
 \section{Управление потоками}
 
 \begin{frame}
@@ -228,13 +277,15 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \begin{itemize}
 	\item Инкапсулирует данные необходимые для исполнения языка
 	\item Хранится в переменной локльной для потока или в регистре
-	\item Должно быть консистентно
-	\pause
+	\item Должно быть консистентно\pause, что означает, что:
 	\begin{itemize}
+		\item необходимо подменять при вызове функций из другого языка
+		\item необходимо возвращать при обработке исключений
 		\item необходимо переключать в мостах
 		\item не должны появляться гонки данных
 	\end{itemize}
 \end{itemize}
+\ifthenelse{\equal{\presMode}{full}}{\pause{\color{red} Необходимо обмануть \texttt{MutatorLock}}} {}
 \end{frame}
 
 
@@ -249,6 +300,45 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 \subsection{На динамически типизированной стороне}
+
+\subsection{Перегрузка}
+\begin{frame}
+\frametitle{Виды перегрузки}
+\begin{itemize}
+	\item \only<1>{по аттрибутам \texttt{this}}\only<2->{\sout{по аттрибутам \texttt{this}}}
+	\pause
+	\item по числу аргументов (elixir, erlang)
+	\item по типам аргументов (typescript?)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Перегрузка методов в GraalVM}
+	Что вызовет \texttt{foo(1)}?\\
+	\begin{enumerate}
+		\item \lstinline|foo(arg: double): void|
+		\item \lstinline|foo(arg: int): void|
+		\item \lstinline|foo(arg: short): void|
+	\end{enumerate}
+	\pause
+	Ответ:
+	\begin{itemize}
+		\item Из статически типизированного языка --- 2
+		\item Из динамически типизированного языка --- 3
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Решение}
+\begin{itemize}
+	\item Наличие перегрузки по числу аргументов
+	\item Выбор набора наиболее общих сигнатур
+	\begin{itemize}
+		\item Главенство вызывающего языка
+		\item Производительность
+	\end{itemize}
+\end{itemize}
+\end{frame}
 
 \subsection{Пример}
 
@@ -271,7 +361,7 @@ let ins /* : Klass */
 let arg /* : number */
 \end{lstlisting} \\
 \hline
-\multicolumn{2}{|c|}{\texttt{ins.func(arg)}}\\
+\multicolumn{2}{|c|}{\lstinline|ins.func(arg)|}\\
 \hline
 \begin{lstlisting}
 Klass.func.virtual(
@@ -325,7 +415,7 @@ ins['func'](
 \hline
 № & инструкция & ввод & пользователи \\
 \hline
-0 & Register Var & & 2, 5 \\
+0 & Register Ins & & 2, 5 \\
 1 & Register Arg & & 0 \\
 \rowcolor{lime}\tikz\node[na](DEOPTKLASS){2}; & DeoptimizeIfNotInstance "Klass" & 0 & \only<3>{7} \\
 \rowcolor<3>{red}\rowcolor<-2>{lime}\tikz\node[na](CONST){3}; & Constant "func\_const" & & 4\\
@@ -344,45 +434,23 @@ ins['func'](
 }
 \end{frame}
 
-\begin{frame}
-\frametitle{Перегрузка методов}
-\begin{itemize}
-	\item по числу аргументов (elixir, erlang)
-	\item по типам аргументов (typescript?)
-	\item \sout{по аттрибутам \texttt{this}}
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Перегрузка методов в GraalVM}
-	Что вызовет \texttt{foo(1)}?\\
-	\begin{enumerate}
-		\item \texttt{void foo(double);}
-		\item \texttt{void foo(int);}
-		\item \texttt{void foo(char);}
-	\end{enumerate}
-	\pause
-	Ответ:
-	\begin{itemize}
-		\item Из статически типизированного языка --- 2
-		\item Из динамически типизированного языка --- 3
-	\end{itemize}
-\end{frame}
-
 \section{Управление памятью}
 
 \begin{frame}
-\frametitle{Обход стека}
+\frametitle{Элементы управления памятью}
 \begin{enumerate}
+	\item Аллокация объектов
 	\item Обход стеков
 	\begin{enumerate}
 		\item определение типа метода
 		\item выбор стеков из состояний потока
 	\end{enumerate}
 	\item Маркировка объектов
+	\ifthenelse{\equal{\presMode}{full}}{\item проблемы с выбором {\color{red}ReferenceProcessor}'а}{}
 \end{enumerate}
 \end{frame}
 
+\MoveSlideToEnd{
 \begin{frame}
 \frametitle{Иерархия маркеров --- старая}
 \begin{center}
@@ -397,6 +465,9 @@ ins['func'](
 }
 \end{center}
 \end{frame}
+}
+
+\section{Замеры производительности}
 
 \begin{frame}[plain]
 \itmopolygons{
@@ -407,5 +478,7 @@ ins['func'](
 	%\includegraphics[scale=.5]{itmo/slogan.pdf}
 }
 \end{frame}
+
+\SlidesAtEnd
 
 \end{document}
