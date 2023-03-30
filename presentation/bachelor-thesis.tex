@@ -13,6 +13,7 @@
 \usepackage{ifthen}
 \usepackage{ulem}
 \usepackage{listings}
+\usepackage{comment}
 
 \usepackage{ITMOtheme}
 
@@ -39,6 +40,14 @@
 	\def\TmpSlidesAtEnd{\OldSlidesAtEnd #1}
 	\let\SlidesAtEnd\TmpSlidesAtEnd
 }%
+}
+
+\newcommand{\BackupBegin}{
+	\newcounter{finalframe}
+	\setcounter{finalframe}{\value{framenumber}}
+}
+\newcommand{\BackupEnd}{
+	\setcounter{framenumber}{\value{finalframe}}
 }
 
 \makeatletter
@@ -112,15 +121,18 @@
 	\titlepage
 \end{frame}
 
-\begin{frame}
-\frametitle{Цели работы}
-\begin{itemize}
-	\item Исследование существующих решений в области межъязыкового взаимодействия
-	\item Выделение затрагиваемых компонент платформы
-	\item Реализация прототипа
-	\item Оценка результатов
-\end{itemize}
-\end{frame}
+\ifthenelse{\equal{\presMode}{full}}{
+} {
+	\begin{frame}[plain, noframenumbering]
+		\frametitle{Ссылки}
+		\begin{itemize}
+			\item \url{https://github.com/kp2pml30/bachelor-thesis}
+			\item \url{https://gitee.com/kprokopenko/arkcompiler_runtime_core}
+			\item \url{https://gitee.com/kprokopenko/arkcompiler_ets_runtime}
+		\end{itemize}
+	\end{frame}
+	\addtocounter{framenumber}{-1}
+}
 
 \section{Обзор}
 
@@ -131,6 +143,18 @@
 	\item Гибкость решений
 	\item Кооперация
 	\item Упрощение найма сотрудников
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Цель и задачи}
+\textbf{Цель:} Исследование возможностей и способов добавления взаимодействия языков с различными типизациями в седу исполнения на платформе Ark\\
+\textbf{Задачи:}
+\begin{itemize}
+	\item Исследование существующих решений в области межъязыкового взаимодействия
+	\item Выделение затрагиваемых компонент платформы
+	\item Реализация прототипа
+	\item Оценка результатов
 \end{itemize}
 \end{frame}
 
@@ -173,12 +197,21 @@
 Однако, компоненты имеют обобщенные фрагменты
 \end{frame}
 
+\begin{frame}
+\frametitle{Затрагиваемые компоненты}
+\begin{center}
+\resizebox{!}{0.8\textheight}{
+\includesvg{build/res/dot/components.dot}
+}
+\end{center}
+\end{frame}
+
 \section{Представление объектов}
 
-\subsection{NaN упаковка}
+\subsection{На динамически типизированной стороне}
 
 \begin{frame}
-\frametitle{Общая идея}
+\frametitle{NaN упаковка --- Общая идея}
 Представление число с плавающей точкой двойной точности
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -197,8 +230,10 @@ qNaN indefinite & знак & 1\dots 1 & 1 & \multicolumn{2}{c|}{0\dots0} \\
 \end{center}
 \end{frame}
 
+\MoveSlideToEnd{
+
 \begin{frame}
-\frametitle{Реализация в Ark}
+\frametitle{NaN упаковка --- Реализация в Ark}
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -217,7 +252,7 @@ int32 & \texttt{ffff} & int32 \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Расширение в Ark}
+\frametitle{NaN упаковка --- Расширение в Ark}
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -237,7 +272,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{center}
 \end{frame}
 
-\subsection{На динамически типизированной стороне}
+}
 
 \begin{frame}
 \frametitle{Представление объектов на динамически типизирвоанной стороне}
@@ -245,13 +280,13 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 	\item[] Как представить ``инородный'' объект?
 	\pause
 	\begin{itemize}
-		\item[] Новым тегом
+		\item[\cmark] Новым тегом
 	\end{itemize}
 	\pause
 	\item[] Как представить статические поля и методы?
 	\pause
 	\begin{itemize}
-		\item[] Полиморфизмом по типу объекта
+		\item[\cmark] Полиморфизмом по типу объекта
 	\end{itemize}
 \end{itemize}
 \end{frame}
@@ -291,6 +326,8 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 
 \section{Вызов методов}
 
+\begin{comment}
+
 \begin{frame}
 \frametitle{На статически типизированной стороне}
 \begin{itemize}
@@ -300,6 +337,8 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 \subsection{На динамически типизированной стороне}
+\end{comment}
+
 
 \subsection{Перегрузка}
 \begin{frame}
@@ -469,6 +508,36 @@ ins['func'](
 
 \section{Замеры производительности}
 
+\begin{frame}[fragile]
+\frametitle{Sunspider/AccessNBody --- Код}
+\begin{center}
+\begin{tabular}[t]{p{0.5\textwidth}|p{0.5\textwidth}}
+\begin{lstlisting}
+class System {
+  class Body { x: double }
+  advance(t: double): void
+  bodies: Array<Body>
+}
+\end{lstlisting} &
+\begin{lstlisting}
+function System.advance(t) {
+  // for i { for j {
+  this.bodies[i].x +=
+    this.bodies[j].x * t
+  // } }
+}
+\end{lstlisting}
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sunspider/AccessNBody --- Результаты}
+\begin{center}
+\includesvg[height=0.8\textheight]{build/res/data-build/access-nbody}
+\end{center}
+\end{frame}
+
 \begin{frame}[plain]
 \itmopolygons{
 	\vfill
@@ -479,6 +548,8 @@ ins['func'](
 }
 \end{frame}
 
+\BackupBegin
 \SlidesAtEnd
+\BackupEnd
 
 \end{document}

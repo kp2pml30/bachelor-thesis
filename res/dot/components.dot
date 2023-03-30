@@ -1,0 +1,23 @@
+digraph G {
+	node [shape=rectangle];
+	Runtime[label="Среда исполнения"];
+	MM[label="Управление памятью"];
+	subgraph cluster_Compiler {
+		label="Компилятор";
+		JIT;
+		AOT;
+	};
+	Interpreter [label="Интерпретатор"];
+	IC [label="Встраиваемые кэши"];
+	IC -> JIT;
+	Interpreter -> IC [dir=both];
+	CCode [label="Скомпилированный код"];
+	JIT -> CCode;
+	AOT -> CCode;
+	MM -> Runtime;
+	MM -> Interpreter;
+	MM -> CCode;
+	CCode -> Runtime [dir=both];
+	Interpreter -> Runtime [dir=both];
+	Runtime -> JIT[style=dashed];
+}

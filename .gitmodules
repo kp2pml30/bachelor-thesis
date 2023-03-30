@@ -1,0 +1,4 @@
+[submodule "data/bachelor-thesis-info-mirror"]
+	path = data/bachelor-thesis-info-mirror
+	url = https://github.com/kp2pml30/bachelor-thesis-info-mirror.git
+	branch = artifacts

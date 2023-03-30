@@ -17,6 +17,11 @@ function xelat() {
 
 function build() {
     mkdir -p build/res/dot
+    rm build/res/data-build 2> /dev/null || true
+    cur="$(pwd)"
+    cd build/res
+    ln -s "$(readlink -f -- "$SCRIPT_DIR/../data/build")" data-build
+    cd "$cur"
     for i in ../res/dot/*.dot
     do
         dot "-obuild/res/dot/$(basename -- "$i").svg" -Tsvg "$i"
