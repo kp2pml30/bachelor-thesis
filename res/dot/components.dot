@@ -5,7 +5,7 @@ digraph G {
 	subgraph cluster_Compiler {
 		label="Компилятор";
 		JIT;
-		AOT;
+		AOT [color=red];
 	};
 	Interpreter [label="Интерпретатор"];
 	IC [label="Встраиваемые кэши"];

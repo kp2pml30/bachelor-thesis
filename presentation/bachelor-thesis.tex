@@ -35,10 +35,13 @@
 \ifthenelse{\equal{\presMode}{full}}{%
 \newcommand{\MoveSlideToEnd}[1]{#1}%
 } {%
+\newcounter{slidesAtEnd}
 \newcommand{\MoveSlideToEnd}[1]{
-	\let\OldSlidesAtEnd\SlidesAtEnd
-	\def\TmpSlidesAtEnd{\OldSlidesAtEnd #1}
-	\let\SlidesAtEnd\TmpSlidesAtEnd
+	\stepcounter{slidesAtEnd}
+	\expandafter\let\csname OldSlidesAtEnd\theslidesAtEnd\endcsname\SlidesAtEnd
+	\expandafter\def\csname SlideContent\theslidesAtEnd\endcsname{#1}
+	\edef\Tmp{\expandafter\noexpand\csname OldSlidesAtEnd\theslidesAtEnd \endcsname\expandafter\noexpand\csname SlideContent\theslidesAtEnd \endcsname}
+	\let\SlidesAtEnd\Tmp
 }%
 }
 
