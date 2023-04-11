@@ -115,7 +115,9 @@
 %\setbeamertemplate{footline}[page number]{}
 \setbeamerfont{footnote}{size=\scriptsize}
 
-\setbeamertemplate{footline}{\colorbox{ITMOblue}{\begin{minipage}[c][0.04\textheight][c]{0.83\paperwidth}\hskip1em\insertfootlinetext\hfill\end{minipage}}\colorbox{ITMOred}{\begin{minipage}[c][0.04\textheight][c]{0.15\paperwidth}\begin{center}\small\textbf{\insertframenumber/\inserttotalframenumber}\end{center}\end{minipage}}}
+\def\FootlineLogo{\ifthenelse{\equal{\presMode}{full}}{\hskip1em}{\hskip0.2em\raisebox{-0.2\height}{\resizebox{!}{0.04\textheight}{\includegraphics{itmo/slogan.pdf}}}\hskip0.5em}}
+
+\setbeamertemplate{footline}{\colorbox{ITMOblue}{\begin{minipage}[c][0.04\textheight][c]{0.83\paperwidth}\FootlineLogo\insertfootlinetext\hfill\end{minipage}}\colorbox{ITMOred}{\begin{minipage}[c][0.04\textheight][c]{0.15\paperwidth}\begin{center}\small\textbf{\insertframenumber/\inserttotalframenumber}\end{center}\end{minipage}}}
 %
 \setbeamerfont{footline}{size=\footnotesize}
 \setbeamerfont{frametitle}{size=\bf\Large}

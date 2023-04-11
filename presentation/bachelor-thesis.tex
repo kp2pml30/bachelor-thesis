@@ -107,7 +107,7 @@
 		\frametitle{Outline}
 		%\Large
 		\small
-		\tableofcontents[currentsection, hideallsubsections]
+		\tableofcontents[currentsection, subsectionstyle=show/show/hide]
 	\end{frame}
 }
 
@@ -139,14 +139,29 @@
 
 \section{Обзор}
 
+\def\HalfPageSize{0.4\textwidth}
+\newcounter{actualListNum}
+
 \begin{frame}
 \frametitle{Актуальность}
-\begin{itemize}
-	\item Переиспользование кода
-	\item Гибкость решений
-	\item Кооперация
-	\item Упрощение найма сотрудников
-\end{itemize}
+\begin{center}
+\begin{tabular}{p{\HalfPageSize}|p{\HalfPageSize}}
+Для программистов&Для компаний\\
+\hline\\
+\begin{enumerate}
+\item Переиспользование кода
+\item Выбор подходящего языка
+\item Использование экспериментальных решений
+\setcounter{actualListNum}{\value{enumi}}
+\end{enumerate}
+&
+\begin{enumerate}
+\setcounter{enumi}{\value{actualListNum}}
+\item Скорость разработки
+\item Упрощение найма сотрудников
+\end{enumerate}
+\end{tabular}
+\end{center}
 \end{frame}
 
 \begin{frame}
@@ -347,7 +362,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \begin{frame}
 \frametitle{Виды перегрузки}
 \begin{itemize}
-	\item \only<1>{по аттрибутам \texttt{this}}\only<2->{\sout{по аттрибутам \texttt{this}}}
+	\item \only<1>{по атрибутам \texttt{this}}\only<2->{\sout{по атрибутам \texttt{this}}}
 	\pause
 	\item по числу аргументов (elixir, erlang)
 	\item по типам аргументов (typescript?)
@@ -464,7 +479,7 @@ ins['func'](
 \rowcolor<3>{red}\rowcolor<-2>{lightgray}\tikz\node[na](DEOPT){4}; & DeoptimizeIfNE "func\_const" & 3 &\\
 \rowcolor<3>{red}\rowcolor<-2>{lightgray}\tikz\node[na](DEOPTKLASS2){5}; & DeoptimizeIfNotInstance "Klass" & 0 & \only<-2>{7} \\
 \rowcolor{lightgray}6 & DeoptimizeIfNotNumber & 1 & 7 \\
-\rowcolor{lightgray}7 & CallVirtual "Klass.func/1" & \only<-2>{5}\only<3>{2}, 6 &\\
+\rowcolor{lightgray}7 & CallVirtualF "Klass.func/1" & \only<-2>{5}\only<3>{2}, 6 &\\
 \hline
 \end{tabular}
 \end{center}
