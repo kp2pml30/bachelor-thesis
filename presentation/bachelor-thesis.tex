@@ -357,7 +357,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \subsection{На динамически типизированной стороне}
 \end{comment}
 
-
+\MoveSlideToEnd{
 \subsection{Перегрузка}
 \begin{frame}
 \frametitle{Виды перегрузки}
@@ -396,6 +396,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 	\end{itemize}
 \end{itemize}
 \end{frame}
+}
 
 \subsection{Пример}
 
@@ -503,6 +504,7 @@ ins['func'](
 		\item выбор стеков из состояний потока
 	\end{enumerate}
 	\item Маркировка объектов
+	\item Перемещение объектов
 	\ifthenelse{\equal{\presMode}{full}}{\item проблемы с выбором {\color{red}ReferenceProcessor}'а}{}
 \end{enumerate}
 \end{frame}
@@ -556,6 +558,19 @@ function System.advance(t) {
 \end{center}
 \end{frame}
 
+\section{Выводы}
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item Исследованы существующие решения
+	\item Выделены затрагиваемые компоненты платформы
+	\item Реализован и протестирован прототип
+	\item Получен прирост производительности
+\end{itemize}
+\end{frame}
+
+\BackupBegin
+
 \begin{frame}[plain]
 \itmopolygons{
 	\vfill
@@ -566,8 +581,14 @@ function System.advance(t) {
 }
 \end{frame}
 
-\BackupBegin
+\section{Дополнительные слайды}
+\let\oldSection\section
+\def\section#1{}
+\let\oldSubSection\subsection
+\def\subsection#1{}
 \SlidesAtEnd
+\let\section\oldSection
+\let\subsection\oldSubSection
 \BackupEnd
 
 \end{document}

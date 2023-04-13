@@ -42,7 +42,10 @@ build)
 ;;
 build-full)
     build
+    cd build
     biber "$PROJ"
+    # --input-directory build
+    cd ..
     xelat
     xelat
 ;;
