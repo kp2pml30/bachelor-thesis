@@ -1,0 +1,40 @@
+digraph G {
+	node [shape=rect];
+	rankdir = TD;
+	splines=false;
+	rank1 [style=invisible];
+	rank2 [style=invisible];
+	rank3 [style=invisible];
+	rank1 -> rank2 -> rank3 [style=invis];
+
+	VM1; TypeSys[label="типовая\nсистема"]; VM2;
+	Nodee[label="узел\nмежъязыкового\nвазимодействия"];
+	balancer [style=invis, label="типоваятиповая\nсистемасистема"];
+
+	{
+		rank = same;
+		rank1 -> VM1-> balancer -> VM2 [style=invis];
+	}
+	{
+		rank = same;
+		r2bal1 [style=invisible];
+		r2bal3 [style=invisible];
+		rank2 -> r2bal1 -> Nodee -> r2bal3 [style=invis];
+	}
+	{
+		rank = same;
+		r3bal2 [style=invisible];
+		r3bal3 [style=invisible];
+		rank3 -> Data -> r3bal2 -> r3bal3 [style=invis];
+	}
+	Data[label="результат\nоперации"];
+	Data-> VM1[color=firebrick3];
+	VM1 -> TypeSys [style=dotted, arrowhead=none];
+	VM1 -> VM2 [color=forestgreen];
+	VM2 -> TypeSys [style=dotted, arrowhead=none];
+	TypeSys -> Nodee [style=dotted];
+	VM2 -> Nodee[color=forestgreen];
+	//{rank=same; VM1; VM2}
+	VM1-> Nodee [color=firebrick3];
+	Nodee -> Data[color=firebrick3];
+}

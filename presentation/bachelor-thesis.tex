@@ -17,13 +17,13 @@
 
 \usepackage{ITMOtheme}
 
-\title[Межъязыковое взаимодействие на платформе Ark]{Поддержка вызова методов и передачи объектов между языками со статическими и динамическими типизациями на платформе Ark}
+\title[Межъязыковое взаимодействие на платформе Ark]{Поддержка вызовов функций и передачи объектов между реализациями языков со статическими и динамическими типизациями в среде выполнения на платформе Ark}
 \ifthenelse{\equal{\presMode}{full}}{
 	\author{Прокопенко К.Д.}
 	\institute{Open Harmony}
 	} {
-	\author{Прокопенко К.Д.\\руководитель: Фильченков А.А.\\консультант: Соломенников Д.И.}
-	\institute{ITMO}
+	\author{студент: Прокопенко К.Д.\\руководитель: Фильченков А.А.\\консультант: Соломенников Д.И.}
+	\institute{ITMO\\бакалаварская работа}
 }
 \date{2023}
 
@@ -130,8 +130,8 @@
 		\frametitle{Ссылки}
 		\begin{itemize}
 			\item \url{https://github.com/kp2pml30/bachelor-thesis}
-			\item \url{https://gitee.com/kprokopenko/arkcompiler_runtime_core}
-			\item \url{https://gitee.com/kprokopenko/arkcompiler_ets_runtime}
+			\item \url{https://gitee.com/kprokopenko/arkcompiler_runtime_core/tree/interop-mem/}
+			\item \url{https://gitee.com/kprokopenko/arkcompiler_ets_runtime/tree/interop-mem/}
 		\end{itemize}
 	\end{frame}
 	\addtocounter{framenumber}{-1}
@@ -150,6 +150,7 @@
 \hline\\
 \begin{enumerate}
 \item Переиспользование кода
+\item Миграция на другой язык
 \item Выбор подходящего языка
 \item Использование экспериментальных решений
 \setcounter{actualListNum}{\value{enumi}}
@@ -171,6 +172,7 @@
 \begin{itemize}
 	\item Исследование существующих решений в области межъязыкового взаимодействия
 	\item Выделение затрагиваемых компонент платформы
+	\item Проектирование архитектуры межъязыкового взаимодействия
 	\item Реализация прототипа
 	\item Оценка результатов
 \end{itemize}
@@ -188,7 +190,7 @@
 		\begin{itemize}
 			\item{FFI (Haskell, python, \dots)}
 			\item{JNI, Project Panama}
-			\item{LuaJIT}
+			\item{LuaJIT FFI}
 			\item{CPPYY}
 		\end{itemize}
 	\pause
@@ -205,8 +207,17 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Особенности платформы Ark}
-Наличие нескольких виртуальных машин влечет следующее:
+\frametitle{Недостатки существующих решений}
+\begin{enumerate}
+	\item Наследование ограничений целевой виртуальной машины
+	\item Неоптимальность интерпретации
+	\item Увеличенное время на разогрев
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Чем отличается платформа Ark?}
+Она объединяет в себе несколько виртуальных машин, что влечет следующее:
 \begin{enumerate}
 	\item Различные среды исполнения
 	\item Различные наборы инструкций
@@ -214,6 +225,8 @@
 \end{enumerate}
 Однако, компоненты имеют обобщенные фрагменты
 \end{frame}
+
+\section{Изменения платформы}
 
 \begin{frame}
 \frametitle{Затрагиваемые компоненты}
@@ -224,13 +237,11 @@
 \end{center}
 \end{frame}
 
-\section{Представление объектов}
-
-\subsection{На динамически типизированной стороне}
+\subsection{Представление объектов}
 
 \begin{frame}
-\frametitle{NaN упаковка --- Общая идея}
-Представление число с плавающей точкой двойной точности
+\frametitle{Представление объектов на динамически типизированной стороне~--- NaN упаковка}
+Представление чисел с плавающей точкой двойной точности
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -251,7 +262,7 @@ qNaN indefinite & знак & 1\dots 1 & 1 & \multicolumn{2}{c|}{0\dots0} \\
 \MoveSlideToEnd{
 
 \begin{frame}
-\frametitle{NaN упаковка --- Реализация в Ark}
+\frametitle{Представление объектов на динамически типизированной стороне~--- NaN упаковка (Ark)}
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -270,7 +281,7 @@ int32 & \texttt{ffff} & int32 \\
 \end{frame}
 
 \begin{frame}
-\frametitle{NaN упаковка --- Расширение в Ark}
+\frametitle{Представление объектов на динамически типизированной стороне~--- NaN упаковка (Ark)}
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
 \hline
@@ -293,7 +304,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 }
 
 \begin{frame}
-\frametitle{Представление объектов на динамически типизирвоанной стороне}
+\frametitle{Представление объектов на динамически типизированной стороне}
 \begin{itemize}
 	\item[] Как представить ``инородный'' объект?
 	\pause
@@ -309,21 +320,19 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{itemize}
 \end{frame}
 
-\subsection{На статически типизированной стороне}
-
 \begin{frame}
-	\frametitle{Новая иерархия классов}
+	\frametitle{Представление объектов на статически типизированной стороне}
 	\begin{center}
 		\includesvg{build/res/dot/statically-typed-tree.dot}
 	\end{center}
 \end{frame}
 
-\ifthenelse{\equal{\presMode}{full}}{
-	\section{``Присваивающее действие''}
-} {
-}
+%\ifthenelse{\equal{\presMode}{full}}{
+%	\section{``Присваивающее действие''}
+%} {
+%}
 
-\section{Управление потоками}
+\subsection{Управление потоками}
 
 \begin{frame}
 \frametitle{Состояние потока}
@@ -342,7 +351,155 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 
-\section{Вызов методов}
+\subsection{Управление памятью}
+
+\begin{frame}
+\frametitle{Элементы управления памятью}
+\begin{enumerate}
+	\item Аллокация объектов
+	\item Обход стеков
+	\begin{enumerate}
+		\item определение типа метода
+		\item выбор стеков из состояний потока
+	\end{enumerate}
+	\item Маркировка объектов
+	\item Перемещение объектов
+	\ifthenelse{\equal{\presMode}{full}}{\item проблемы с выбором {\color{red}ReferenceProcessor}'а}{}
+\end{enumerate}
+\end{frame}
+
+\MoveSlideToEnd{
+\begin{frame}
+\frametitle{Иерархия маркеров --- старая}
+\begin{center}
+\includesvg{build/res/dot/marker_was.dot}
+\end{center}
+\end{frame}
+\begin{frame}
+\frametitle{Иерархия маркеров --- новая}
+\begin{center}
+\scalebox{0.6}{
+\includesvg{build/res/dot/marker_new.dot}
+}
+\end{center}
+\end{frame}
+}
+
+\section{Архитектура межъязыкового взаимодействия}
+
+\begin{frame}
+\frametitle{Что ещё необходимо сделать?}
+\begin{center}
+\begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
+\tikz\node[na](archInterp){интерпретатор}; & \tikz\node[na](archIC){встраиваемые кэши}; & \tikz\node[na](archJIT){скомпилированный код};
+\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+	\draw[->, color=black] (archInterp) to (archIC);
+	\draw[->, color=black] (archIC) to (archJIT);
+\end{tikzpicture}
+\end{tabular}
+\end{center}
+\pause
+Необходим общий интерфейс, который позволял бы:
+\begin{itemize}
+	\item Создавать узлы взаимодействия
+	\item Интерпретировать и компилировать эти узлы
+	\item Совершать конверсии типов
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Схема}
+\includesvg[height=0.9\textheight]{build/res/dot/architecture-sample.dot}
+\end{frame}
+
+\begin{frame}
+\frametitle{Дальнейшие улучшения}
+Необходимо наличие дополнительного языка, обладающего свойствами:
+\begin{enumerate}
+	\item Независимость от текущего состояния потока
+	\item Возможность выполнения базовых операций всех языков
+	\item Доступ к низкоуровневым операциям и конверсии соглашений о вызовах
+	\item Конвертация во внутренне представление
+	\item Автоматическое управление объектами
+\end{enumerate}
+\end{frame}
+
+\section{Оценка результатов}
+
+\begin{frame}
+\frametitle{Тестирование}
+\begin{itemize}
+	\item Валидация семантики
+	\item Сравнение результата полной интерпретации и JIT компиляции
+	\item Тестирование оптимизаций через промежуточное представление
+\end{itemize}
+\end{frame}
+
+\subsection{Замеры производительности}
+
+\begin{frame}[fragile]
+\frametitle{Sunspider/AccessNBody --- Код}
+\begin{center}
+\begin{tabular}[t]{p{0.5\textwidth}|p{0.5\textwidth}}
+\begin{lstlisting}
+class System {
+  class Body { x: double }
+  advance(t: double): void
+  bodies: Array<Body>
+}
+\end{lstlisting} &
+\begin{lstlisting}
+function System.advance(t) {
+  // for i { for j {
+  this.bodies[i].x +=
+    this.bodies[j].x * t
+  // } }
+}
+\end{lstlisting}
+\end{tabular}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sunspider/AccessNBody --- Результаты}
+\begin{center}
+\includesvg[height=0.8\textheight]{build/res/data-build/access-nbody}
+\end{center}
+\end{frame}
+
+\section{Выводы}
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+	\item Исследованы существующие решения
+	\item Выделены затрагиваемые компоненты платформы
+	\item Спроектирована архитерктура межъязыкового взаимодействия
+	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7330} {\color{ITMOred}-573})
+	\item Получен прирост производительности на общепринятом тесте
+\end{itemize}
+\end{frame}
+
+\BackupBegin
+
+\begin{frame}[plain]
+\itmopolygons{
+	\vfill
+	\Huge{Спасибо за внимание}
+	\only<2>{\\ Вопросы?}
+	\vfill
+	%\includegraphics[scale=.5]{itmo/slogan.pdf}
+}
+\end{frame}
+
+\section{Дополнительные слайды}
+\let\oldSection\section
+\def\section#1{}
+\let\oldSubSection\subsection
+\def\subsection#1{}
+
+\SlidesAtEnd
+
+\section{Пример вызова метода}
 
 \begin{comment}
 
@@ -355,7 +512,6 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 \subsection{На динамически типизированной стороне}
-\end{comment}
 
 \MoveSlideToEnd{
 \subsection{Перегрузка}
@@ -397,8 +553,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{itemize}
 \end{frame}
 }
-
-\subsection{Пример}
+\end{comment}
 
 \begin{frame}[fragile]
 \frametitle{Данные}
@@ -435,19 +590,6 @@ ins['func'](
 \hline
 \end{tabular}
 \end{center}
-
-%\begin{itemize}
-%	\item[] \tikz\node[na](V1){ins};.\tikz\node[na](F1){func};(\tikz\node[na](A1){arg};)
-%	\item[]
-%	\item[] (\tikz\node[na](V3){ins};[\tikz\node[na](F2){`func'};])(this=\tikz\node[na](V2){ins};, args=[\tikz\node[na](A2){arg};])
-%\end{itemize}
-%\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
-%	\draw[->] (A1.south) -- (A2.north);
-%	\draw[->] (F1.south) -- (F2.north);
-%	\draw[->] (V1.south) -- (V2.north);
-%	\draw[->] (V1.south) -- (V3.north);
-%\end{tikzpicture}
-
 \end{frame}
 
 \begin{frame}
@@ -492,101 +634,7 @@ ins['func'](
 }
 \end{frame}
 
-\section{Управление памятью}
 
-\begin{frame}
-\frametitle{Элементы управления памятью}
-\begin{enumerate}
-	\item Аллокация объектов
-	\item Обход стеков
-	\begin{enumerate}
-		\item определение типа метода
-		\item выбор стеков из состояний потока
-	\end{enumerate}
-	\item Маркировка объектов
-	\item Перемещение объектов
-	\ifthenelse{\equal{\presMode}{full}}{\item проблемы с выбором {\color{red}ReferenceProcessor}'а}{}
-\end{enumerate}
-\end{frame}
-
-\MoveSlideToEnd{
-\begin{frame}
-\frametitle{Иерархия маркеров --- старая}
-\begin{center}
-\includesvg{build/res/dot/marker_was.dot}
-\end{center}
-\end{frame}
-\begin{frame}
-\frametitle{Иерархия маркеров --- новая}
-\begin{center}
-\scalebox{0.6}{
-\includesvg{build/res/dot/marker_new.dot}
-}
-\end{center}
-\end{frame}
-}
-
-\section{Замеры производительности}
-
-\begin{frame}[fragile]
-\frametitle{Sunspider/AccessNBody --- Код}
-\begin{center}
-\begin{tabular}[t]{p{0.5\textwidth}|p{0.5\textwidth}}
-\begin{lstlisting}
-class System {
-  class Body { x: double }
-  advance(t: double): void
-  bodies: Array<Body>
-}
-\end{lstlisting} &
-\begin{lstlisting}
-function System.advance(t) {
-  // for i { for j {
-  this.bodies[i].x +=
-    this.bodies[j].x * t
-  // } }
-}
-\end{lstlisting}
-\end{tabular}
-\end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Sunspider/AccessNBody --- Результаты}
-\begin{center}
-\includesvg[height=0.8\textheight]{build/res/data-build/access-nbody}
-\end{center}
-\end{frame}
-
-\section{Выводы}
-\begin{frame}
-\frametitle{Выводы}
-\begin{itemize}
-	\item Исследованы существующие решения
-	\item Выделены затрагиваемые компоненты платформы
-	\item Реализован и протестирован прототип
-	\item Получен прирост производительности
-\end{itemize}
-\end{frame}
-
-\BackupBegin
-
-\begin{frame}[plain]
-\itmopolygons{
-	\vfill
-	\Huge{Спасибо за внимание}
-	\only<2>{\\ Вопросы?}
-	\vfill
-	%\includegraphics[scale=.5]{itmo/slogan.pdf}
-}
-\end{frame}
-
-\section{Дополнительные слайды}
-\let\oldSection\section
-\def\section#1{}
-\let\oldSubSection\subsection
-\def\subsection#1{}
-\SlidesAtEnd
 \let\section\oldSection
 \let\subsection\oldSubSection
 \BackupEnd
