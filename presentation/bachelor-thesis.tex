@@ -364,7 +364,10 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 	\end{enumerate}
 	\item Маркировка объектов
 	\item Перемещение объектов
-	\ifthenelse{\equal{\presMode}{full}}{\item проблемы с выбором {\color{red}ReferenceProcessor}'а}{}
+	\ifthenelse{\equal{\presMode}{full}}{
+		\pause
+		\item Выбор общей настройки сборщика мусора ({\color{red}\texttt{MT\_MODE\_TASK}})
+		\item Проблемы с выбором {\color{red}\texttt{ReferenceProcessor}}'а}{}
 \end{enumerate}
 \end{frame}
 
@@ -388,7 +391,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \section{Архитектура межъязыкового взаимодействия}
 
 \begin{frame}
-\frametitle{Что ещё необходимо сделать?}
+\frametitle{Чего не хватает для исполнения?}
 \begin{center}
 \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
 \tikz\node[na](archInterp){интерпретатор}; & \tikz\node[na](archIC){встраиваемые кэши}; & \tikz\node[na](archJIT){скомпилированный код};
@@ -413,8 +416,8 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Дальнейшие улучшения}
-Необходимо наличие дополнительного языка, обладающего свойствами:
+\frametitle{Дальнейшие улучшения архитектуры}
+Необходимо наличие дополнительного языка ({\color{ITMOgold}irtoc?}), обладающего свойствами:
 \begin{enumerate}
 	\item Независимость от текущего состояния потока
 	\item Возможность выполнения базовых операций всех языков
@@ -468,6 +471,25 @@ function System.advance(t) {
 \end{frame}
 
 \section{Выводы}
+
+\ifthenelse{\equal{\presMode}{full}}{
+\begin{frame}
+\frametitle{Что дальше?}
+\begin{center}
+\begin{tabular}{p{0.5\textwidth}p{0.3\textwidth}}
+Элемент&Требования\\
+\hline
+Обработка исключений в скомпилированном коде&специальный стековый кадр\\
+irtoc интерпретатор&\\
+Конвертация на статической стороне&\texttt{mov.dyn}\\
+JIT на статической стороне&\texttt{invokedynamic}\\
+Конвертация замыканий&\texttt{DynamicProxy}\\
+\end{tabular}
+\end{center}
+\end{frame}
+	} {
+}
+
 \begin{frame}
 \frametitle{Выводы}
 \begin{itemize}
@@ -476,8 +498,22 @@ function System.advance(t) {
 	\item Спроектирована архитерктура межъязыкового взаимодействия
 	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7330} {\color{ITMOred}-573})
 	\item Получен прирост производительности на общепринятом тесте
+	\item Определено направление дальнейшего развития
 \end{itemize}
 \end{frame}
+
+\ifthenelse{\equal{\presMode}{full}}{
+\begin{frame}
+\frametitle{Выявленные проблемные места платформы}
+\begin{itemize}
+	\item \texttt{ReferenceProcessor}
+	\item Завязанность компилятора на \texttt{EntityId}
+	\item Полное отделение компилятора от среды исполнения
+	\item Отсутствие AnyConst
+	\item Неявность мест использования предположения об однопоточности ecmascript'а
+\end{itemize}
+\end{frame}
+}{}
 
 \BackupBegin
 
