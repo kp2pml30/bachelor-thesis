@@ -7,7 +7,7 @@ digraph G {
 	rank3 [style=invisible];
 	rank1 -> rank2 -> rank3 [style=invis];
 
-	VM1; TypeSys[label="типовая\nсистема"]; VM2;
+	VM1; TypeSys[label="система\nтипов"]; VM2;
 	Nodee[label="узел\nмежъязыкового\nвазимодействия"];
 	balancer [style=invis, label="типоваятиповая\nсистемасистема"];
 

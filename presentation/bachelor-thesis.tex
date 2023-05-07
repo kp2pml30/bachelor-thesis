@@ -22,7 +22,7 @@
 	\author{Прокопенко К.Д.}
 	\institute{Open Harmony}
 	} {
-	\author{студент: Прокопенко К.Д.\\руководитель: Фильченков А.А.\\консультант: Соломенников Д.И.}
+	\author{студент: Прокопенко К.Д.\\руководитель: Беляев Е.А.\\консультант: Соломенников Д.И.}
 	\institute{ITMO\\бакалаварская работа}
 }
 \date{2023}
@@ -167,13 +167,13 @@
 
 \begin{frame}
 \frametitle{Цель и задачи}
-\textbf{Цель:} Исследование возможностей и способов добавления взаимодействия языков с различными типизациями в седу исполнения на платформе Ark\\
+\textbf{Цель:} Исследование возможностей и способов добавления взаимодействия языков с различными типизациями в среду исполнения на платформе Ark с минимизацией неуправляемого кода\\
 \textbf{Задачи:}
 \begin{itemize}
 	\item Исследование существующих решений в области межъязыкового взаимодействия
 	\item Выделение затрагиваемых компонент платформы
 	\item Проектирование архитектуры межъязыкового взаимодействия
-	\item Реализация прототипа
+	\item Реализация прототипа с минимизацией нативных прослоек
 	\item Оценка результатов
 \end{itemize}
 \end{frame}
@@ -181,12 +181,12 @@
 \begin{frame}
 \frametitle{Существующие решения}
 \begin{itemize}
-	\item Нативный-нативный
+	\item[\xmark] Нативный-нативный
 		\begin{itemize}
 			\item{C++, Zig, Carbon}
 		\end{itemize}
 	\pause
-	\item Управляемый-нативный
+	\item[\xmark] Управляемый-нативный
 		\begin{itemize}
 			\item{FFI (Haskell, python, \dots)}
 			\item{JNI, Project Panama}
@@ -194,13 +194,13 @@
 			\item{CPPYY}
 		\end{itemize}
 	\pause
-	\item Управляемый-управляемый
+	\item[\cmark] Управляемый-управляемый
 		\begin{itemize}
 			\item{JVM/.NET}
 			\begin{itemize}
-				\item{Kotlin, Scala}
-				\item{Nashorn}
-				\item{Graal VM}
+				\item[\xmark]{Kotlin, Scala}
+				\item[\cmark]{Nashorn}
+				\item[\cmark]{Graal VM}
 			\end{itemize}
 		\end{itemize}
 \end{itemize}
@@ -223,7 +223,11 @@
 	\item Различные наборы инструкций
 	\item Различное представление данных
 \end{enumerate}
-Однако, компоненты имеют обобщенные фрагменты
+Однако, компоненты имеют обобщенные фрагменты; и задача разбивается на части:
+\begin{enumerate}
+	\item Изменения платформы
+	\item Архитектуру межъязыкового взаимодействия
+\end{enumerate}
 \end{frame}
 
 \section{Изменения платформы}
@@ -287,13 +291,13 @@ int32 & \texttt{ffff} & int32 \\
 \hline
 число бит & 16 & \multicolumn{2}{c|}{48} \\
 \hline
-значение & \multicolumn{2}{c}{``тэг''} & нагрузка \\
+значение & ``тэг'' & \multicolumn{2}{c|}{нагрузка} \\
 \hline
 object & \texttt{0000} & \texttt{0} & указатель \\
 \hline
 foreign object & \texttt{0000} & \texttt{1} & указатель \\
 \hline
-float64 & \begin{tabular}{c} \texttt{0001} \\ ---- \\ \texttt{fffe} \end{tabular} & \multicolumn{2}{c|}{\dots} \\
+float64 & \begin{tabular}{c} \texttt{0001} \\ --- \\ \texttt{fffe} \end{tabular} & \multicolumn{2}{c|}{\dots} \\
 \hline
 int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \hline
@@ -307,13 +311,11 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \frametitle{Представление объектов на динамически типизированной стороне}
 \begin{itemize}
 	\item[] Как представить ``инородный'' объект?
-	\pause
 	\begin{itemize}
 		\item[\cmark] Новым тегом
 	\end{itemize}
 	\pause
 	\item[] Как представить статические поля и методы?
-	\pause
 	\begin{itemize}
 		\item[\cmark] Полиморфизмом по типу объекта
 	\end{itemize}
@@ -411,13 +413,13 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Схема}
+\frametitle{Схема обращения к объекту другого языка}
 \includesvg[height=0.9\textheight]{build/res/dot/architecture-sample.dot}
 \end{frame}
 
 \begin{frame}
 \frametitle{Дальнейшие улучшения архитектуры}
-Необходимо наличие дополнительного языка ({\color{ITMOgold}irtoc?}), обладающего свойствами:
+Необходимо наличие дополнительного языка\ifthenelse{\equal{\presMode}{full}}{ ({\color{ITMOgold}irtoc?})}{}, обладающего свойствами:
 \begin{enumerate}
 	\item Независимость от текущего состояния потока
 	\item Возможность выполнения базовых операций всех языков
@@ -480,10 +482,18 @@ function System.advance(t) {
 Элемент&Требования\\
 \hline
 Обработка исключений в скомпилированном коде&специальный стековый кадр\\
+\hline
+Перегрузка по типам аргументов&\\
+\hline
 irtoc интерпретатор&\\
+\hline
 Конвертация на статической стороне&\texttt{mov.dyn}\\
+\hline
 JIT на статической стороне&\texttt{invokedynamic}\\
+\hline
 Конвертация замыканий&\texttt{DynamicProxy}\\
+\hline
+Встраивание функций&выделение безопасного общего подмножества
 \end{tabular}
 \end{center}
 \end{frame}
@@ -496,9 +506,9 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 	\item Исследованы существующие решения
 	\item Выделены затрагиваемые компоненты платформы
 	\item Спроектирована архитерктура межъязыкового взаимодействия
-	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7330} {\color{ITMOred}-573})
-	\item Получен прирост производительности на общепринятом тесте
-	\item Определено направление дальнейшего развития
+	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7461} {\color{ITMOred}-601})
+	\item Получен прирост производительности в 2 раза на общепринятом тесте
+	\ifthenelse{\equal{\presMode}{full}}{\item Определено направление дальнейшего развития}{}
 \end{itemize}
 \end{frame}
 
@@ -529,9 +539,42 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 
 \section{Дополнительные слайды}
 \let\oldSection\section
-\def\section#1{}
 \let\oldSubSection\subsection
+\def\section#1{\oldSubSection{#1}}
 \def\subsection#1{}
+
+\begin{frame}
+\frametitle{Дополнительный стековый кадр}
+\begin{center}
+\begin{tabular}{|c|@{}cr@{}|}
+\hline
+\multicolumn{2}{|c}{Адрес возврата}&\tikz\node[na](frameUpper){};\\
+\hline
+\multicolumn{2}{|c}{Указатель на предыдущий кадр}&\\
+\hline
+\multicolumn{2}{|c}{Локальные переменные}&\\
+\hline
+Дополнительный кадр&\multicolumn{2}{@{}c@{}|}{\begin{tabular}{c}
+Адрес возврата ($\ast$)\\
+\hline
+Указатель на предыдущий кадр\tikz\node[na](frameLink){};\\
+\hline
+Специальное число\\
+\hline
+Указатель на состояние потока\\
+\end{tabular}}\\
+\hline
+\multicolumn{2}{|c}{Стековые аргументы}&\\
+\hline
+\end{tabular}
+\end{center}
+($\ast$)~--- заполняется при каждом вызове
+
+\begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+	\draw[->, color=black] (frameLink.east) to [bend right=45] (frameUpper.east);
+\end{tikzpicture}
+
+\end{frame}
 
 \SlidesAtEnd
 

@@ -2,6 +2,7 @@ import glob, os
 import json
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 import numpy as np
 import re
 
@@ -65,19 +66,30 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 		plt.axhline(y=i, linestyle='dotted', alpha=0.35, color='gray')
 	background_cmap = plt.get_cmap('Pastel1')
 	inds = list(set([x.split('-')[0] for x in labels]))
+	marker_inds = list(set(['-'.join(x.split('-')[1:]) for x in labels]))
 	inds.sort()
+	marker_inds.sort()
+	def getColOfInd(o):
+		return inds.index(o.split('-')[0])
+	markers_array = [('red', '.'), ('green', 'x'), ('blue', '^')]
+	def getMarkerOf(o):
+		return markers_array[marker_inds.index('-'.join(o.split('-')[1:]))]
 	def getColOf(o):
-		return background_cmap(inds.index(o.split('-')[0]) / len(inds))
+		return background_cmap(getColOfInd(o) / len(inds))
 	legend_handles = []
 	for i in inds:
 		legend_handles.append(mpatches.Patch(color = getColOf(i), label=i))
+	for i in marker_inds:
+		pcol, pmark = markers_array[marker_inds.index(i)]
+		legend_handles.append(mlines.Line2D([], [], color=pcol, marker=pmark, linestyle='None', label=labelPrintMap('a-' + i)))
 	plt.legend(handles=legend_handles)
 
 	plt.xlim(0.5, len(labels) + 0.5)
 	for i, (lab, y) in enumerate(zip(labels, times)):
 		plt.axvspan(i + 0.5, i + 1.5, facecolor=getColOf(lab), alpha=0.8)
 		x = np.random.normal(i + 1, 0.04, size=len(y))
-		plt.scatter(x, y, alpha=0.3)
+		pcol, pmark = getMarkerOf(lab)
+		plt.scatter(x, y, alpha=0.3, marker=pmark, color=pcol)
 	labelsSet = dict(list(zip(labels, enumerate(tiks))))
 	for lf, mf in labelsSet.items():
 		lt = lf + '-int'
@@ -94,7 +106,7 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 		real_dir = dir * 0.8
 		real_end = real_begin + real_dir
 		# plt.arrow(*list(real_begin), *list(real_dir), head_width=0.1)
-		plt.annotate("", xy=real_end, xytext=real_begin, arrowprops=dict(arrowstyle="->", color='red'))
+		plt.annotate("", xy=real_end, xytext=real_begin, arrowprops=dict(arrowstyle="->", color='black'))
 
 	base = os.path.basename(filename).replace('.json', '')
 	plt.savefig(f'build/{base}.svg', format='svg')
