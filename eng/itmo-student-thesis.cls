@@ -240,6 +240,7 @@
 \renewcommand*{\newblockpunct}{\textemdash\addnbspace\bibsentence}
 \DeclareFieldFormat*{pages}{\mkpageprefix[bookpagination][\mbox]{#1}}
 \DeclareFieldFormat*{labelnumberwidth}{#1}
+\DeclareFieldFormat*{urldate}{(дата обращения: #1)}
 \DefineBibliographyStrings{english}{pages={p\adddot}}
 \DefineBibliographyExtras{russian}{\protected\def\bibrangedash{\textendash\penalty\hyphenpenalty}}
 
