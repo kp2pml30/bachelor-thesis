@@ -23,7 +23,7 @@ function build() {
     cd "$cur"
     for i in ../res/dot/*.dot
     do
-        dot "-obuild/res/dot/$(basename -- "$i").svg" -Tsvg "$i"
+        dot -Gfontsize=14 "-obuild/res/dot/$(basename -- "$i").svg" -Tsvg "$i"
     done
     xelat
 }

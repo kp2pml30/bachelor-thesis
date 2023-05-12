@@ -14,7 +14,6 @@
 \usepackage{ulem}
 \usepackage{listings}
 \usepackage{comment}
-
 \usepackage{ITMOtheme}
 
 \input{../ru-common/defs.tex}
@@ -31,6 +30,7 @@
 
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
+\newcommand{\MyDone}{{\color{ITMOred}\cmark}}
 
 \let\SlidesAtEnd\empty
 
@@ -98,10 +98,14 @@
 	{}
 \makeatother
 
+\def\MyResearchTargetNext#1#2{\item {\MakeUppercase#1}}
+
 \begin{document}
 
 \tikzstyle{every picture}+=[remember picture]
 \tikzstyle{na}=[shape=rectangle,inner sep=0pt,text depth=0pt]
+
+\begin{comment}
 
 \AtBeginSection[]
 {
@@ -121,6 +125,8 @@
 		\tableofcontents[currentsection, currentsubsection, subsectionstyle=show/shaded/hide]
 	\end{frame}
 }
+
+\end{comment}
 
 \begin{frame}[plain]
 	\titlepage
@@ -236,8 +242,8 @@
 \end{enumerate}
 Однако, реализации имеют общие компоненты; и задача разбивается на части:
 \begin{enumerate}
-	\item ``Низкоуровневые'' изменения платформы
-	\item Создание архитектуры межъязыкового взаимодействия
+	\item Изменения платформы
+	\item Создание общего интерфейса межъязыкового взаимодействия
 \end{enumerate}
 \end{frame}
 
@@ -325,7 +331,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 На динамически типизированной стороне&На статически типизированной стороне\\
 \hline
 \begin{itemize}
-	\item[] Как представить ``инородный'' объект?
+	\item[] Как представить статический объект?
 	\begin{itemize}
 		\item[\cmark] Новым тегом
 	\end{itemize}
@@ -334,7 +340,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 		\item[\cmark] Полиморфизмом по типу объекта
 	\end{itemize}
 \end{itemize}
-&\includesvg{build/res/dot/statically-typed-tree.dot}
+&\scalebox{0.8}{\includesvg{build/res/dot/statically-typed-tree.dot}}
 \end{tabular}
 \end{center}
 \end{frame}
@@ -369,13 +375,13 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \frametitle{Элементы управления памятью}
 \begin{enumerate}
 	\item Аллокация объектов
-	\item Обход стеков\only<2>{ \cmark}
+	\item Обход стеков\only<2>{ \MyDone}
 	\begin{enumerate}
 		\item определение типа метода
-		\item выбор стеков из состояний потока\only<2>{ \cmark}
+		\item выбор стеков из состояний потока\only<2>{ \MyDone}
 	\end{enumerate}
-	\item Маркировка объектов\only<2>{ \cmark}
-	\item Перемещение объектов\only<2>{ \cmark}
+	\item Маркировка объектов\only<2>{ \MyDone}
+	\item Перемещение объектов\only<2>{ \MyDone}
 	\ifthenelse{\equal{\presMode}{full}}{
 		\pause
 		\item Выбор общей настройки сборщика мусора ({\color{red}\texttt{MT\_MODE\_TASK}})
@@ -400,10 +406,10 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \end{frame}
 }
 
-\section{Архитектура межъязыкового взаимодействия}
+\section{Общее устройство межъязыкового взаимодействия}
 
 \begin{frame}
-\frametitle{Чего не хватает для исполнения?}
+\frametitle{Чего не хватает для исполнения программ?}
 \begin{center}
 \begin{tabular}{p{0.3\textwidth}p{0.3\textwidth}p{0.3\textwidth}}
 \tikz\node[na](archInterp){интерпретатор}; & \tikz\node[na](archIC){встраиваемые кэши}; & \tikz\node[na](archJIT){скомпилированный код};
@@ -465,7 +471,7 @@ class System {
   bodies: Array<Body>
 }
 \end{lstlisting} &
-\begin{lstlisting}
+\begin{lstlisting}[escapechar=\%]
 function System.advance(t) {
   // for i { for j {
   this.bodies[i].x +=
@@ -475,6 +481,14 @@ function System.advance(t) {
 \end{lstlisting}
 \end{tabular}
 \end{center}
+\pause
+Рассматриваются модификации:
+\begin{enumerate}
+	\item Код и объекты динамически типизированы
+	\item $\rightarrow$ \texttt{Body} статически типизирован
+	\item $\rightarrow$ \texttt{Array<Body>} статически типизирован
+\end{enumerate}
+
 \end{frame}
 
 \begin{frame}

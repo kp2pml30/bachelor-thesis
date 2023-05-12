@@ -1,12 +1,16 @@
 import glob, os
 import json
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 import numpy as np
 import re
 
-# plt.rcParams.update({'font.size': 30})
+matplotlib.rc('text', usetex=True)
+#plt.rc('text.latex', unicode=True)
+plt.rcParams['text.latex.preamble']= ''.join([r'\usepackage[english,russian]{babel}'])
+plt.rcParams.update({'font.size': 14})
 
 
 abspath = os.path.abspath(__file__)
@@ -45,14 +49,12 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 		res = '$' + match.group(1) + '\\cdot10^{' + pow + '}$'
 		return res
 	def labelPrintMap(x):
-		if x == 'node':
-			return x
 		y = '-'.join(x.split('-')[1:])
 		if y == 'int':
-			return 'static\nobject'
+			return 'статический\nBody'
 		if y == 'int-arr':
-			return 'static\narray'
-		return 'dynamic'
+			return 'статический\nArray<Body>'
+		return 'динамические\nобъекты'
 	tiks = np.median(np.array(times), axis=1)
 	tiks1 = []
 	for x in np.sort(tiks):
@@ -61,7 +63,7 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 		else:
 			tiks1[-1] = (tiks1[-1] + x) / 2
 	plt.yticks(tiks1, map(formatter, tiks1))
-	plt.xticks(range(1, len(labels) + 1), map(labelPrintMap, labels))
+	plt.xticks(range(1, len(labels) + 1), map(labelPrintMap, labels), rotation=30)
 	for i in tiks:
 		plt.axhline(y=i, linestyle='dotted', alpha=0.35, color='gray')
 	background_cmap = plt.get_cmap('Pastel1')
@@ -71,14 +73,17 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 	marker_inds.sort()
 	def getColOfInd(o):
 		return inds.index(o.split('-')[0])
-	markers_array = [('red', '.'), ('green', 'x'), ('blue', '^')]
+	markers_array = [('red', '.'), ('blue', 'x'), ('green', '^')]
 	def getMarkerOf(o):
 		return markers_array[marker_inds.index('-'.join(o.split('-')[1:]))]
 	def getColOf(o):
 		return background_cmap(getColOfInd(o) / len(inds))
 	legend_handles = []
 	for i in inds:
-		legend_handles.append(mpatches.Patch(color = getColOf(i), label=i))
+		name= i
+		if name == 'ark':
+			name = '\\underline{ark}'
+		legend_handles.append(mpatches.Patch(color = getColOf(i), label=name))
 	for i in marker_inds:
 		pcol, pmark = markers_array[marker_inds.index(i)]
 		legend_handles.append(mlines.Line2D([], [], color=pcol, marker=pmark, linestyle='None', label=labelPrintMap('a-' + i)))
@@ -109,7 +114,7 @@ for filename in glob.iglob('bachelor-thesis-info-mirror/artifacts/benchs/*.json'
 		plt.annotate("", xy=real_end, xytext=real_begin, arrowprops=dict(arrowstyle="->", color='black'))
 
 	base = os.path.basename(filename).replace('.json', '')
-	plt.savefig(f'build/{base}.svg', format='svg')
+	plt.savefig(f'build/{base}.svg', format='svg', bbox_inches='tight')
 
 	print("\ttotal")
 	plt.figure(figsize=figsize)
