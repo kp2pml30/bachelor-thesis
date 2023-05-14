@@ -220,7 +220,7 @@
 \RequirePackage[
     backend=biber,
     bibencoding=utf8,
-    sorting=nyt,
+    sorting=none,
     sortcites=true,
     bibstyle=gost-numeric,
     citestyle=numeric-comp,
