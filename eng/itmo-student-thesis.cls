@@ -8,6 +8,7 @@
 \newif\if@shouldusexelatex
 \newif\if@shouldmakespecification
 \newif\if@shouldmakeannotation
+\newif\if@shouldmaketitle
 \newif\if@shouldmaketitlepage@ru
 \newif\if@shouldmakespecification@ru
 \newif\if@shouldmakeannotation@ru
@@ -19,6 +20,7 @@
 \DeclareOptionX{times}{\@shouldusexelatextrue}
 \DeclareOptionX{specification}{\@shouldmakespecificationtrue}
 \DeclareOptionX{annotation}{\@shouldmakeannotationtrue}
+\DeclareOptionX{titlepage}{\@shouldmaketitletrue}
 \DeclareOptionX{specification-extra-ru}{\@shouldmakespecification@rutrue}
 \DeclareOptionX{annotation-extra-ru}{\@shouldmakeannotation@rutrue}
 \DeclareOptionX{titlepage-extra-ru}{\@shouldmaketitlepage@rutrue}
@@ -1168,7 +1170,7 @@
     }
 
 	\pagenumbering{gobble}
-	\typeoutTitlePage
+	\if@shouldmaketitle\typeoutTitlePage\fi
     \if@shouldmaketitlepage@ru\begin{otherlanguage}{russian}\typeoutTitlePage\end{otherlanguage}\fi
     \if@shouldmakespecification\typeoutSpecification\fi
     \if@shouldmakespecification@ru\begin{otherlanguage}{russian}\typeoutSpecification\end{otherlanguage}\fi
