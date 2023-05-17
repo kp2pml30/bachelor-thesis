@@ -67,7 +67,7 @@
 	\newcommand{\@gooble@rowcolor@@}[1][]{\ignorespaces}
 \makeatother
 
-\setfootlinetext{\insertsection\ifthenelse{\equal{\insertsubsection}{}}{}{/\insertsubsection}}
+\setfootlinetext{\quad\insertsection\ifthenelse{\equal{\insertsubsection}{}}{}{ / \insertsubsection}}
 
 \lstdefinelanguage{etspseudo}{
 	keywords={let, const, typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
@@ -449,21 +449,21 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 
 \section{Оценка результатов}
 
-\begin{frame}
-\frametitle{Тестирование}
-\begin{itemize}
-	\item Валидация семантики
-	\item Сравнение результата полной интерпретации и JIT компиляции
-	\item Тестирование оптимизаций через промежуточное представление
-\end{itemize}
-\end{frame}
+%\begin{frame}
+%\frametitle{Тестирование}
+%\begin{itemize}
+%	\item Валидация семантики
+%	\item Сравнение результата полной интерпретации и JIT компиляции
+%	\item Тестирование оптимизаций через промежуточное представление
+%\end{itemize}
+%\end{frame}
 
 \subsection{Замеры производительности}
 
 \begin{frame}[fragile]
 \frametitle{Sunspider/AccessNBody --- Код}
 \begin{center}
-\begin{tabular}[t]{p{0.5\textwidth}|p{0.5\textwidth}}
+\begin{tabular}[t]{p{0.45\textwidth}|p{0.55\textwidth}}
 \begin{lstlisting}
 class System {
   class Body { x: double }
@@ -496,6 +496,35 @@ function System.advance(t) {
 \begin{center}
 \includesvg[height=0.8\textheight]{build/res/data-build/access-nbody}
 \end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Sunspider/AccessNBody --- Код (объяснение)}
+\def\MakeMark#1#2{{\color{ITMOpistachio}[#1$\rightarrow$#2]}}
+\begin{center}
+\begin{tabular}[t]{p{0.45\textwidth}|p{0.55\textwidth}}
+\begin{lstlisting}
+class System {
+  class Body { x: double }
+  advance(t: double): void
+  bodies: Array<Body>
+}
+\end{lstlisting} &
+\begin{lstlisting}[escapechar=\%]
+function System.advance(t) {
+  // for i { for j {
+  this.bodies[i]%\textsuperscript{\MakeMark{2}{3}}%.x +=
+    this.bodies[j]%\textsuperscript{\MakeMark{2}{3}}%.x%\textsuperscript{\MakeMark{1}{2}}% * t
+  // } }
+}
+\end{lstlisting}
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+	\item[] \MakeMark{1}{2}~--- удаление проверки на \texttt{double}
+	\item[] \MakeMark{2}{3}~--- замена проверки на \texttt{Body} на \texttt{null}
+\end{itemize}
 \end{frame}
 
 \section{Выводы}
@@ -575,27 +604,27 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 \hline
 \multicolumn{2}{|c}{Адрес возврата}&\tikz\node[na](frameUpper){};\\
 \hline
-\multicolumn{2}{|c}{Указатель на предыдущий кадр}&\\
+\multicolumn{2}{|c}{Предыдущий кадр $\ast$}&\\
 \hline
 \multicolumn{2}{|c}{Слот метаданных}&\\
 \hline
-\multicolumn{2}{|c}{Локальные переменные}&\\
+\multicolumn{2}{|c}{\dots Локальные переменные}&\\
+\hline\hline
+\textbf{Дополнительный кадр}&\multicolumn{2}{@{}c@{}|}{\begin{tabular}{c}
+Адрес возврата ($\bigstar$)\\
 \hline
-Дополнительный кадр&\multicolumn{2}{@{}c@{}|}{\begin{tabular}{c}
-Адрес возврата ($\ast$)\\
-\hline
-Указатель на предыдущий кадр\tikz\node[na](frameLink){};\\
+Предыдущий кадр $\ast$\tikz\node[na](frameLink){};\\
 \hline
 Специальное число\\
 \hline
-Указатель на состояние потока\\
+Cостояние потока $\ast$\\
 \end{tabular}}\\
-\hline
-\multicolumn{2}{|c}{Стековые аргументы}&\\
+\hline\hline
+\multicolumn{2}{|c}{\dots Стековые аргументы}&\\
 \hline
 \end{tabular}
 \end{center}
-($\ast$)~--- заполняется при каждом вызове
+($\bigstar$)~--- заполняется при каждом вызове
 
 \begin{tikzpicture}[remember picture,overlay,cyan,rounded corners,>=stealth,shorten > =1pt,shorten <=1pt,thick]
 	\draw[->, color=black] (frameLink.east) to [bend right=45] (frameUpper.east);

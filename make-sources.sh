@@ -36,6 +36,7 @@ echo "archive password: $PASS" >> "full-src-password.txt"
 FILES=$(cat << EOF
 full-src-password.txt
 ru/bachelor-thesis.tex
+ru-common
 res
 full.zip
 EOF
