@@ -13,7 +13,7 @@ digraph G {
 
 	{
 		rank = same;
-		rank1 -> VM1-> balancer -> VM2 [style=invis];
+		rank1 -> VM1 -> balancer -> VM2 [style=invis];
 	}
 	{
 		rank = same;
@@ -28,13 +28,14 @@ digraph G {
 		rank3 -> Data -> r3bal2 -> r3bal3 [style=invis];
 	}
 	Data[label="результат\nоперации"];
-	Data-> VM1[color=firebrick3];
-	VM1 -> TypeSys [style=dotted, arrowhead=none];
-	VM1 -> VM2 [color=forestgreen];
-	VM2 -> TypeSys [style=dotted, arrowhead=none];
+	Data-> VM1[color=firebrick3, xlabel="результат\nисполнения"];
+	VM1 -> TypeSys:w [style=dotted, arrowhead=none];
+	VM1 -> VM2 [color=forestgreen, xlabel="запрос действия"];
+	VM2 -> TypeSys:e [style=dotted, arrowhead=none];
 	TypeSys -> Nodee [style=dotted];
 	VM2 -> Nodee[color=forestgreen];
 	//{rank=same; VM1; VM2}
-	VM1-> Nodee [color=firebrick3];
+	VM1 -> Nodee [color=firebrick3];
 	Nodee -> Data[color=firebrick3];
+
 }

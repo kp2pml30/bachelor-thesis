@@ -1,0 +1,12 @@
+digraph G {
+	subgraph cluster_Legend {
+		label="Виды изменений";
+		MyLegend [shape=none, label=<
+			<table border="0">
+				<tr><td bgcolor="black">padd</td><td></td><td align="left">изменения платформы</td></tr>
+				<tr><td bgcolor="blue"></td><td></td><td align="left">создание интерфейса взаимодействия</td></tr>
+				<tr><td bgcolor="red"></td><td></td><td align="left">отсутствуют</td></tr>
+			</table>
+		>];
+	}
+}

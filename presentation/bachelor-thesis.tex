@@ -15,6 +15,24 @@
 \usepackage{listings}
 \usepackage{comment}
 \usepackage{ITMOtheme}
+\usepackage{xfp}
+
+\usetikzlibrary{decorations.pathreplacing}
+
+\makeatletter
+\newcommand{\Resizebox}[4][]{%
+  \if\relax\detokenize{#1}\relax
+    \resizebox{#2}{#3}{#4}%
+  \else
+    \begingroup
+    \sbox0{#4}%
+    \sbox2{\resizebox{#2}{#3}{#4}}%
+    \@ifdefinable{#1}{\xdef#1{\fpeval{\wd2/\wd0}}}%
+    \usebox{2}%
+    \endgroup
+  \fi
+}
+\makeatother
 
 \input{../ru-common/defs.tex}
 
@@ -132,32 +150,15 @@
 	\titlepage
 \end{frame}
 
-\ifthenelse{\equal{\presMode}{full}}{
-} {
-	\begin{frame}[plain, noframenumbering]
-		\frametitle{Ссылки на материалы работы}
-		\begin{itemize}
-			\item презентация
-				\begin{itemize}
-					\item\url{https://github.com/kp2pml30/bachelor-thesis}
-				\end{itemize}
-			\item реализация
-				\begin{itemize}
-					\item\url{https://gitee.com/kprokopenko/arkcompiler_runtime_core/tree/interop-mem/}\\
-					\item\url{https://gitee.com/kprokopenko/arkcompiler_ets_runtime/tree/interop-mem/}
-				\end{itemize}
-		\end{itemize}
-	\end{frame}
-	\addtocounter{framenumber}{-1}
-}
+\addtocounter{framenumber}{-1}
 
 \section{Обзор}
 
-\def\HalfPageSize{0.4\textwidth}
+\def\HalfPageSize{0.45\textwidth}
 \newcounter{actualListNum}
 
 \begin{frame}
-\frametitle{Актуальность межъязкового взаимодействия}
+\frametitle{Актуальность межъязыкового взаимодействия}
 \begin{center}
 \begin{tabular}{p{\HalfPageSize}|p{\HalfPageSize}}
 Для программистов&Для компаний\\
@@ -166,15 +167,20 @@
 \item Переиспользование кода
 \item Миграция на другой язык
 \item Выбор подходящего языка
-\item Использование экспериментальных решений
+\item Использование непопулярных языков
 \setcounter{actualListNum}{\value{enumi}}
 \end{enumerate}
 &
 \begin{enumerate}
 \setcounter{enumi}{\value{actualListNum}}
-\item Скорость разработки
-\item Упрощение найма сотрудников
+\item Скорость разработки\hfill\tikz\node[na](profU){};
+\item Упрощение найма сотрудников\hfill\tikz\node[na](profB){};
 \end{enumerate}
+
+%\begin{tikzpicture}[remember picture,overlay,>=stealth,shorten > =1pt,shorten <=1pt,thick]
+%	\draw[decorate, decoration = {brace}] (profU.north) -- (profB.south);
+%\end{tikzpicture}
+
 \end{tabular}
 \end{center}
 \end{frame}
@@ -189,7 +195,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Существующие реализации межъязыкового взаимдоействия}
+\frametitle{Существующие реализации межъязыкового взаимодействия}
 \begin{columns}[T]
 \begin{column}{0.5\textwidth}
 \begin{itemize}
@@ -232,15 +238,16 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Чем отличается платформа Ark?}
-Она объединяет в себе несколько виртуальных машин, что влечет следующее:
+\frametitle{Что такое Ark и чем он отличается?}
+Платформа Ark объединяет в себе несколько виртуальных машин, что влечет:
 \begin{enumerate}
 	\item Различные среды исполнения
 	\item Различные наборы инструкций
 	\item Различное представление данных
-	\item Полное отсутствие межъязыкового взаимодействия
+	\item \textbf{Полное} отсутствие межъязыкового взаимодействия
 \end{enumerate}
-Однако, реализации имеют общие компоненты; и задача разбивается на части:
+\pause
+Но реализации имеют общие компоненты; и задача решается разбиением на части:
 \begin{enumerate}
 	\item Изменения платформы
 	\item Создание общего интерфейса межъязыкового взаимодействия
@@ -251,11 +258,22 @@
 
 \begin{frame}
 \frametitle{Затрагиваемые компоненты}
+\begin{columns}
+\begin{column}{0.5\textwidth}
 \begin{center}
-\resizebox{!}{0.8\textheight}{
-\includesvg{build/res/dot/components.dot}
-}
+	\Resizebox[\scaleForComps]{!}{0.8\textheight}{
+		\includesvg{build/res/dot/components-main.dot}
+		}
 \end{center}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\scalebox{\scaleForComps}{
+	\includesvg{build/res/dot/components-legend.dot}
+}
+\end{column}
+
+\end{columns}
 \end{frame}
 
 \subsection{Представление объектов}
@@ -373,20 +391,46 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 
 \begin{frame}
 \frametitle{Элементы управления памятью}
-\begin{enumerate}
-	\item Аллокация объектов
-	\item Обход стеков\only<2>{ \MyDone}
-	\begin{enumerate}
-		\item определение типа метода
-		\item выбор стеков из состояний потока\only<2>{ \MyDone}
-	\end{enumerate}
-	\item Маркировка объектов\only<2>{ \MyDone}
-	\item Перемещение объектов\only<2>{ \MyDone}
+
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+	\item[\phantom{\textrightarrow}1.] Аллокация объектов
+	\item[\only<3>{\textrightarrow}{\phantom{\textrightarrow}}2.] Обход стеков\only<2->{ \MyDone}
+	\item[\only<4>{\textrightarrow}{\phantom{\textrightarrow}}3.] Маркировка объектов\only<2->{ \MyDone}
+	\item[\only<5>{\textrightarrow}{\phantom{\textrightarrow}}4.] Перемещение объектов\only<2->{ \MyDone}
 	\ifthenelse{\equal{\presMode}{full}}{
 		\pause
-		\item Выбор общей настройки сборщика мусора ({\color{red}\texttt{MT\_MODE\_TASK}})
-		\item Проблемы с выбором {\color{red}\texttt{ReferenceProcessor}}'а}{}
-\end{enumerate}
+		\item[\phantom{\textrightarrow}5.] Выбор общей настройки сборщика мусора ({\color{red}\texttt{MT\_MODE\_TASK}})\only<2->{ \MyDone}
+		\item[\phantom{\textrightarrow}6.] Проблемы с выбором {\color{red}\texttt{ReferenceProcessor}}'а}{}
+\end{itemize}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\only<3>{Обход стеков
+\begin{enumerate}
+	\item Определение типа метода
+	\item Выбор стеков из состояний потока
+\end{enumerate}}
+
+\only<4>{Маркировка объектов
+
+\begin{itemize}
+	\item Сохранение производительности одноязычного исполнения
+	\item Гипотеза о редкой смене языка
+	\item Переиспользование кода
+	\item[$\Rightarrow$] Добавление комбинированного режима
+\end{itemize}}
+
+\only<5>{Перемещение объектов
+
+\begin{itemize}
+	\item Последствия добавления второго объектного тэга
+\end{itemize}}
+\end{column}
+
+\end{columns}
 \end{frame}
 
 \MoveSlideToEnd{
@@ -430,7 +474,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 
 \begin{frame}
 \frametitle{Схема обращения к объекту другого языка}
-\includesvg[height=0.9\textheight]{build/res/dot/architecture-sample.dot}
+\resizebox{!}{0.9\textheight}{\includesvg{build/res/dot/architecture-sample.dot}}
 \end{frame}
 
 \MoveSlideToEnd{
@@ -492,9 +536,17 @@ function System.advance(t) {
 \end{frame}
 
 \begin{frame}
+\frametitle{Sunspider/AccessNBody --- Результаты интерпретации}
+\begin{center}
+\includesvg[height=0.7\textheight]{build/res/data-build/access-nbody-interpreter-wide}
+\end{center}
+($\ast$ GraalVM не позволяет отключить JIT компилятор)
+\end{frame}
+
+\begin{frame}
 \frametitle{Sunspider/AccessNBody --- Результаты}
 \begin{center}
-\includesvg[height=0.8\textheight]{build/res/data-build/access-nbody}
+\includesvg[height=0.80\textheight]{build/res/data-build/access-nbody-wide}
 \end{center}
 \end{frame}
 
@@ -560,8 +612,13 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 \begin{itemize}
 	\item Исследованы существующие решения
 	\item Выделены затрагиваемые компоненты платформы
-	\item Спроектирована архитерктура межъязыкового взаимодействия
-	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7461} {\color{ITMOred}-601})
+	\item Спроектировано устройство межъязыкового взаимодействия
+	\item Реализован и протестирован прототип ({\color{ITMOgreen}+7920} {\color{ITMOred}-715}); добавлены:
+	\begin{itemize}
+		\item[\cmark] Выполнение кода на общем стеке
+		\item[\cmark] Работа с общим сборщиком мусора
+		\item[\cmark] \dots
+	\end{itemize}
 	\item Получен прирост производительности в 2 раза на общепринятом тесте
 	\ifthenelse{\equal{\presMode}{full}}{\item Определено направление дальнейшего развития}{}
 \end{itemize}
@@ -581,6 +638,23 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 }{}
 
 \BackupBegin
+
+\ifthenelse{\equal{\presMode}{full}}{
+} {
+	\begin{frame}[plain, noframenumbering]
+		\frametitle{Ссылки на материалы работы}
+			Презентация
+				\begin{itemize}
+					\item\url{https://github.com/kp2pml30/bachelor-thesis}
+				\end{itemize}
+			Реализация
+				\begin{itemize}
+					\item\url{https://gitee.com/kprokopenko/arkcompiler_runtime_core/tree/interop-mem/}\\
+					\item\url{https://gitee.com/kprokopenko/arkcompiler_ets_runtime/tree/interop-mem/}
+				\end{itemize}
+	\end{frame}
+	\addtocounter{framenumber}{-1}
+}
 
 \begin{frame}[plain]
 \itmopolygons{

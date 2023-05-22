@@ -21,18 +21,4 @@ digraph G {
 	CCode -> Runtime [dir=both];
 	Interpreter -> Runtime [dir=both];
 	Runtime -> JIT[style=dashed];
-
-	subgraph cluster_Legend {
-		label="Виды изменений";
-		MyLegend [shape=none, label=<
-			<table border="0">
-				<tr><td bgcolor="black">padd</td><td></td><td align="left">изменения платформы</td></tr>
-				<tr><td bgcolor="blue"></td><td></td><td align="left">создание интерфейса взаимодействия</td></tr>
-				<tr><td bgcolor="red"></td><td></td><td align="left">отсутствуют</td></tr>
-			</table>
-		>];
-	}
-
-	Runtime -> MyLegend [style=invis];
-	CCode -> MyLegend [style=invis];
 }
