@@ -42,7 +42,7 @@
 	\institute{Open Harmony}
 	} {
 	\author{Студент: Прокопенко К.Д., M34361\\Руководитель: Беляев Е.А., к.т.н., доцент ФИТиП\\Консультант: Соломенников Д.И.}
-	\institute{ИТМО\\бакалаварская работа}
+	\institute{ИТМО\\бакалаврская работа}
 }
 \date{2023}
 
@@ -187,7 +187,7 @@
 
 \begin{frame}
 \frametitle{Цель и задачи}
-\textbf{Цель:} \MyResearchAim\\
+\textbf{Цель:} \MyResearchAim.\\
 \textbf{Задачи:}
 \begin{itemize}
 	\MyResearchTargets
@@ -257,11 +257,11 @@
 \section{Изменения платформы}
 
 \begin{frame}
-\frametitle{Затрагиваемые компоненты}
+\frametitle{Модифицированные компоненты}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{center}
-	\Resizebox[\scaleForComps]{!}{0.8\textheight}{
+	\Resizebox[\scaleForComps]{!}{0.85\textheight}{
 		\includesvg{build/res/dot/components-main.dot}
 		}
 \end{center}
@@ -389,7 +389,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 
 \subsection{Управление памятью}
 
-\begin{frame}
+\begin{frame}[t]
 \frametitle{Элементы управления памятью}
 
 
@@ -536,7 +536,7 @@ function System.advance(t) {
 \end{frame}
 
 \begin{frame}
-\frametitle{Sunspider/AccessNBody --- Результаты интерпретации}
+\frametitle{Sunspider/AccessNBody --- время интерпретации}
 \begin{center}
 \includesvg[height=0.7\textheight]{build/res/data-build/access-nbody-interpreter-wide}
 \end{center}
@@ -544,10 +544,11 @@ function System.advance(t) {
 \end{frame}
 
 \begin{frame}
-\frametitle{Sunspider/AccessNBody --- Результаты}
+\frametitle{Sunspider/AccessNBody --- время исполнения после компиляции}
 \begin{center}
-\includesvg[height=0.80\textheight]{build/res/data-build/access-nbody-wide}
+\includesvg[height=0.7\textheight]{build/res/data-build/access-nbody-wide}
 \end{center}
+Прирост производительности в 2.2 раза
 \end{frame}
 
 \begin{frame}[fragile]
@@ -659,7 +660,7 @@ JIT на статической стороне&\texttt{invokedynamic}\\
 \begin{frame}[plain]
 \itmopolygons{
 	\vfill
-	\Huge{Спасибо за внимание}
+	\Huge{Спасибо за внимание!}
 	\vfill
 	%\includegraphics[scale=.5]{itmo/slogan.pdf}
 }
