@@ -1,8 +1,8 @@
 digraph G {
 	node [shape="record"];
 	base [label="{MarkerBase|.data}"];
-	markers [label="{Marker&lt;STATIC&gt;|func Mark}", penwidth=2];
-	markerd [label="{Marker&lt;DYNAMIC&gt;|func Mark}", penwidth=2];
+	markers [label="{Marker&lt;STATIC&gt;|func Mark}", color=green];
+	markerd [label="{Marker&lt;DYNAMIC&gt;|func Mark}", color=green];
 	base -> markers;
 	base -> markerd;
 }
