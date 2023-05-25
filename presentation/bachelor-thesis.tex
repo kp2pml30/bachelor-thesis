@@ -85,28 +85,28 @@
 	\newcommand{\@gooble@rowcolor@@}[1][]{\ignorespaces}
 \makeatother
 
-\setfootlinetext{\quad\insertsection\ifthenelse{\equal{\insertsubsection}{}}{}{ / \insertsubsection}}
-
-\lstdefinelanguage{etspseudo}{
-	keywords={let, const, typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
-	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={class, export, boolean, throw, implements, import, this, void, int, long, short, double},
-	ndkeywordstyle=\color{purple}\bfseries,
-	identifierstyle=\color{black},
-	sensitive=false,
-	comment=[l]{//},
-	morecomment=[s]{/*}{*/},
-	commentstyle=\color{purple}\ttfamily,
-	stringstyle=\color{red}\ttfamily,
-	morestring=[b]',
-	morestring=[b]"
-}
+\setfootlinetext{}
+%\setfootlinetext{\quad\insertsection\ifthenelse{\equal{\insertsubsection}{}}{}{ / \insertsubsection}}
 
 \lstset{
 	showtabs=true,
 	breaklines=true,
-	language=etspseudo,
+	language=etspseudo
+	%identifierstyle=\idstyle,
 }
+
+%\makeatletter
+%\newcommand*\idstyle{%
+%	\expandafter\id@style\the\lst@token\relax
+%}
+%\def\id@style#1#2\relax{%
+%	\ifcat#1\relax\else
+%					\ifnum`#1=\uccode`#1%
+%									\itshape
+%					\fi
+%	\fi
+%}
+%\makeatother
 
 \makeatletter
 \patchcmd{\beamer@sectionintoc}
@@ -241,9 +241,9 @@
 \frametitle{Что такое Ark и чем он отличается?}
 Платформа Ark объединяет в себе несколько виртуальных машин, что влечет:
 \begin{enumerate}
-	\item Различные среды исполнения
-	\item Различные наборы инструкций
-	\item Различное представление данных
+	\item Наличие различных сред исполнения
+	\item Наличие различных наборов инструкций
+	\item Наличие различных представлений данных
 	\item \textbf{Полное} отсутствие межъязыкового взаимодействия
 \end{enumerate}
 \pause
@@ -371,7 +371,8 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \subsection{Управление потоками}
 
 \begin{frame}
-\frametitle{Состояние потока}
+\frametitle{<<состояние потока>>}
+Состояние потока обладает свойствами:
 \begin{itemize}
 	\item Инкапсулирует данные необходимые для исполнения языка
 	\item Хранится в переменной локальной для потока или в регистре
@@ -505,7 +506,7 @@ int32 & \texttt{ffff} & \multicolumn{2}{c|}{int32} \\
 \subsection{Замеры производительности}
 
 \begin{frame}[fragile]
-\frametitle{Sunspider/AccessNBody --- Код}
+\frametitle{Sunspider/AccessNBody --- код}
 \begin{center}
 \begin{tabular}[t]{p{0.45\textwidth}|p{0.55\textwidth}}
 \begin{lstlisting}
@@ -552,7 +553,7 @@ function System.advance(t) {
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{Sunspider/AccessNBody --- Код (объяснение)}
+\frametitle{Sunspider/AccessNBody --- код (объяснение)}
 \def\MakeMark#1#2{{\color{ITMOpistachio}[#1$\rightarrow$#2]}}
 \begin{center}
 \begin{tabular}[t]{p{0.45\textwidth}|p{0.55\textwidth}}
